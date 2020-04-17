@@ -14,15 +14,15 @@ This code is heavily "work in progress" and not complete, it’s not optimized.
 getID();                    //Returns ID as integer
 getApiToken();              //Returns API Token as String
 getDefaultWid();            //Returns Email as String
-getFullName();              //Returns Name of user as char*
+getFullName();              //Returns Name of user as String
 getJqTimeOfDayFormat();     //Returns Time of day JQ formatting as String
 getJqDateFormat();          //Returns date JQ formatting as String
 getTimeOfDayFormat();       //Returns Time of day formatting as String
 getDateFormat();            //Returns date formatting as String
 getStoreStartAndStopTime(); //Returns START/STOP time as bool
 getBeginningOfWeek();       //Returns The day the weeks starts on as uint
-getLang();                  //Returns The language used as char*
-getDurationFormat();        //Returns Duration formatting as char*
+getLang();                  //Returns The language used as String
+getDurationFormat();        //Returns Duration formatting as String
 getAt();                    //Returns AT? as String
 getCreation();              //Returns Account creation date as String
 getTimezone();              //Returns Time zone as string
