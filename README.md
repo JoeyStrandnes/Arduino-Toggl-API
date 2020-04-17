@@ -2,7 +2,7 @@
 Port of Toggls official API V8
 https://github.com/toggl/toggl_api_docs
 
-This more of a learning exercise for me to take all the code with a grain of salt.
+This more of a learning exercise for me so take all the code with a grain of salt.
 The code is written for the ESP8266 but can easily be ported to the ESP32. Will do so when I have access to an ESP32.
 
 This code is heavily "work in progress" and not complete, it’s not optimized.
