@@ -30,26 +30,25 @@ class Toggl{
     const String    getApiToken();
     const uint16_t  getDefaultWid();
     const String    getEmail();
-    const String     getFullName();
+    const String    getFullName();
     const String    getJqTimeOfDayFormat();
     const String    getJqDateFormat();
     const String    getTimeOfDayFormat();
     const String    getDateFormat();
     const bool      getStoreStartAndStopTime();
-    const uint16_t   getBeginningOfWeek();
-    const String     getLang();
-    const String     getDurationFormat();
+    const uint16_t  getBeginningOfWeek();
+    const String    getLang();
+    const String    getDurationFormat();
     const String    getAt();
     const String    getCreation();
     const String    getTimezone();
-
     
-    void getWorkspace();
-    
-    //POST requests
-    String StartTimeEntry();
-    int StopTimeEntry(String ID);
-    int CreateTag(String const Name);
+    String getWorkSpace();
+     
+    //POST & PUT requests
+    String StartTimeEntry(String const& Description, String const& Tags, int const& PID, String const& CreatedWith);
+    void   StopTimeEntry(String const& ID);
+    void   CreateTag(String const& Name, int const& WID);
 
     //General functionality
     void init(String const& SSID, String const& PASS);
@@ -58,9 +57,6 @@ class Toggl{
     
   private:
 
-    // Fingerprint for Toggle API, expires on 01/10/2021
-    //const char fingerprint[] PROGMEM {"51240ac662cb06319ca77b133a9de73f6ba789bf"};
-    //DynamicJsonDocument getUserData();
     String getUserData(String Input);
     String AuthorizationKey{};
 

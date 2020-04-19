@@ -24,7 +24,6 @@ void Toggl::init(String const& SSID, String const& PASS){
  void Toggl::setAuth(String const Token){
 
   String TokenHolder{Token + ":api_token"};
-  //Serial.println(TokenHolder);
   uint8_t Size{TokenHolder.length()+1};
   
   char Encoded[Size];
@@ -32,16 +31,9 @@ void Toggl::init(String const& SSID, String const& PASS){
   
   TokenHolder.toCharArray(TESTBUFF,Size);
 
-  /*
-  Serial.println(Size);
-  Serial.println(sizeof(TESTBUFF));
-  Serial.println(TESTBUFF);
-  */
   int encoded_length = b64_encode(Encoded, TESTBUFF, Size-1);
   String Out{Encoded};
-  //Serial.println(Out);
-  
-  
+
   AuthorizationKey = ("Basic " + Out);
 }
 
@@ -49,8 +41,8 @@ void Toggl::init(String const& SSID, String const& PASS){
 String Toggl::getUserData(String Input){
 
   if ((WiFi.status() == WL_CONNECTED)) {
-      String payload{};
       
+      String payload{};
       
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
@@ -63,57 +55,32 @@ String Toggl::getUserData(String Input){
       payload = https.getString();
       https.end();
       
-      StaticJsonDocument<1024> doc;
+      const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
+      DynamicJsonDocument doc(capacity);
 
       deserializeJson(doc, payload);
+      doc.shrinkToFit();
       const String Output = doc["data"][Input];
       doc.clear();
+      doc.garbageCollect();
+      
       return Output;
   }
     
 }
 
-/*
-int Toggl::CreateTag(String const Name){
 
-  if ((WiFi.status() == WL_CONNECTED)) {
-    
-      std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
-      
-      HTTPClient https;
-      https.begin(*client, "https://www.toggl.com/api/v8/tags");
-      https.addHeader("Authorization", AuthorizationKey, true);
-      https.addHeader("Content-Type", " application/json");
 
-      DynamicJsonDocument doc2(512);
-      doc2["tag"]["name"] = Name;
-      doc2["tag"]["wid"] = 0;
-      
-      String Out{};
 
-      //char Out[] = "{"tag"\n""{\n""name\":\"HelloWorld\"\n""wid\":\"666\"}\n""}"; 
-      serializeJson(doc2, Out);
 
-      Serial.println(Out);
-      
+//POST & PUT request for hadnling the timer
 
-      int https_Code{};
-      https_Code = https.POST(Out);
-
-      Serial.println(https.getString());
-      https.end();
-
-      return https_Code;
-
-    
-  }
-}
-
-String Toggl::StartTimeEntry(){
+String Toggl::StartTimeEntry(String const& Description, String const& Tags, int const& PID,String const& CreatedWith){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
+      String payload;
+      
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
       
@@ -121,35 +88,35 @@ String Toggl::StartTimeEntry(){
       https.begin(*client, "https://www.toggl.com/api/v8/time_entries/start");
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
+
+      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
+      DynamicJsonDocument doc(capacity);
       
-      DynamicJsonDocument doc(100);
-      doc["time_entry"]["description"] = "HelloWorld";
-      doc["time_entry"]["tags"] = "TEST";
-      doc["time_entry"]["pid"] = 159958000;
-      doc["time_entry"]["created_with"] = "ESP";
+      doc["time_entry"]["description"] = Description;
+      doc["time_entry"]["tags"] = Tags;
+      doc["time_entry"]["pid"] = PID;
+      doc["time_entry"]["created_with"] = CreatedWith;
       
-      String Out{};
-      //String TimeID{};
+      serializeJson(doc, payload);
       
-      serializeJson(doc, Out);
-      
-      //Serial.println(Out);
-    
-      https.POST(Out);
+      https.POST(payload);
       doc.clear();
       
-      doc = https.getString();
-      String TimeID = doc["data"]["id"];
+      payload = https.getString();   
+      deserializeJson(doc, payload);
       
-      //serializeJson(TMP_T, TimeID);
+      String TimeID = doc["data"]["id"];
+
+      doc.clear();
+      doc.garbageCollect();
+      
       return TimeID;
   }
   
-    //return ("Error");
-  
 }
 
-int Toggl::StopTimeEntry(String ID){
+
+void Toggl::StopTimeEntry(String const& ID){
   
 if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -157,40 +124,82 @@ if ((WiFi.status() == WL_CONNECTED)) {
       client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
       
       HTTPClient https;
-      https.begin(*client, "https://www.toggl.com/api/v8/time_entries/stop");
+      https.begin(*client, "https://www.toggl.com/api/v8/time_entries/" + ID +"/stop");
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
       
-
-      
-      int https_Code{};      
-      https_Code = https.PUT(ID);
-      
-      Serial.println(https.getString());
-      return https_Code;
-  }
-  
-    //return ("Error");
-  
-
-  
+            
+      https.PUT("");
+     
+      }
 }
-void Toggl::getWorkspace(){
 
+
+void Toggl::CreateTag(String const& Name, int const& WID){
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+      String payload;      
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
       
       HTTPClient https;
       https.begin(*client, "https://www.toggl.com/api/v8/tags");
       https.addHeader("Authorization", AuthorizationKey, true);
+      https.addHeader("Content-Type", " application/json");
 
-      Serial.println(https.GET());
+      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
+      DynamicJsonDocument doc(capacity);
+      
+      doc["tag"]["name"] = Name;
+      doc["tag"]["wid"] = WID;
+      
+      serializeJson(doc, payload);
+      
+      https.POST(payload);
       Serial.println(https.getString());
-      https.end();
+      
+      doc.clear();
+      doc.garbageCollect();
+
+    }
 }
 
-*/
-//ToDo: For all GET requests. Remove the need for the temporary JSON document for every request.
+
+String Toggl::getWorkSpace(){
+  
+  if ((WiFi.status() == WL_CONNECTED)) {   
+
+      String Output{};
+      
+      std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+      
+      DynamicJsonDocument doc(1024);
+      
+      StaticJsonDocument<50> filter;
+      filter[0]["id"] = true;
+      filter[0]["name"] = true;
+      
+      HTTPClient https;
+      https.begin(*client, "https://www.toggl.com/api/v8/workspaces");
+      https.addHeader("Authorization", AuthorizationKey, true);
+
+      https.GET();
+
+      deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
+      https.end();
+      serializeJsonPretty(doc, Output);
+      doc.garbageCollect();
+      filter.garbageCollect();
+      
+      return Output; 
+      
+     }
+}
+
+//ToDo: For all GET requests. Better memory handling
+//GET requests for user Data
 
 const uint16_t Toggl::getID(){
     
@@ -199,11 +208,13 @@ const uint16_t Toggl::getID(){
     return output;
 }
 
+
 const String Toggl::getApiToken(){
 
     return getUserData("api_token");
   
 }
+
 
 const uint16_t Toggl::getDefaultWid(){
 
@@ -219,6 +230,7 @@ const String Toggl::getEmail(){
     return getUserData("email");
 }
 
+
 const String Toggl::getFullName(){
 
     return getUserData("fullname");
@@ -231,6 +243,7 @@ const String Toggl::getJqTimeOfDayFormat(){
     return getUserData("jquery_timeofday_format");
 }
 
+
 const String Toggl::getJqDateFormat(){
 
     return getUserData("jquery_date_format");
@@ -241,6 +254,7 @@ const String Toggl::getTimeOfDayFormat(){
     
     return getUserData("timeofday_format");
 }
+
 
 const String Toggl::getDateFormat(){
 
@@ -277,21 +291,34 @@ const String Toggl::getDurationFormat(){
     return getUserData("duration_format");
 }
 
+
 const String Toggl::getAt(){
     
     return getUserData("at");
   
 }
 
+
 const String Toggl::getCreation(){
     
     return getUserData("created_at");
 }
 
+
 const String Toggl::getTimezone(){
 
     return getUserData("timezone");
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
