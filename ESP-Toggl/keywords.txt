@@ -1,0 +1,37 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Toggl	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+getID	KEYWORD2
+getApiToken	KEYWORD2
+getDefaultWid	KEYWORD2
+getEmail	KEYWORD2
+getFullName	KEYWORD2
+getJqTimeOfDayFormat	KEYWORD2
+getJqDateFormat	KEYWORD2
+getTimeOfDayFormat	KEYWORD2
+getDateFormat	KEYWORD2
+getStoreStartAndStopTime	KEYWORD2
+getBeginningOfWeek	KEYWORD2
+getLang	KEYWORD2
+getDurationFormat	KEYWORD2
+getAt	KEYWORD2
+getCreation	KEYWORD2
+getTimezone	KEYWORD2
+getWorkSpace	KEYWORD2
+
+StartTimeEntry	KEYWORD2
+StopTimeEntry	KEYWORD2
+CreateTag	KEYWORD2
+setAuth	KEYWORD2
+
+#######################################
