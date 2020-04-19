@@ -16,7 +16,8 @@ This code is heavily "work in progress" and not complete, it’s not optimized.
 ```c++
 getID();                    //Returns ID as integer
 getApiToken();              //Returns API Token as String
-getDefaultWid();            //Returns Email as String
+getDefaultWid();            //Return the default Workspace ID as Int
+getEmail();                 //Returns Email as String   
 getFullName();              //Returns Name of user as String
 getJqTimeOfDayFormat();     //Returns Time of day JQ formatting as String
 getJqDateFormat();          //Returns date JQ formatting as String
