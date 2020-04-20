@@ -10,7 +10,7 @@ Toggl::Toggl(){
    
 void Toggl::init(String const& SSID, String const& PASS){
 
-
+  
   WiFi.begin(SSID, PASS);
 
   while(WiFi.status() != WL_CONNECTED){
@@ -68,9 +68,6 @@ String Toggl::getUserData(String Input){
   }
     
 }
-
-
-
 
 
 //POST & PUT request for hadnling the timer
@@ -135,11 +132,54 @@ if ((WiFi.status() == WL_CONNECTED)) {
 }
 
 
-void Toggl::CreateTag(String const& Name, int const& WID){
+String Toggl::CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
-      String payload;      
+      String payload;
+      
+      std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+      
+      HTTPClient https;
+      https.begin(*client, "https://www.toggl.com/api/v8/time_entries");
+      https.addHeader("Authorization", AuthorizationKey, true);
+      https.addHeader("Content-Type", " application/json");
+
+      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
+      DynamicJsonDocument doc(capacity);
+      
+      doc["time_entry"]["description"] = Description;
+      doc["time_entry"]["tags"] = Tags;
+      doc["time_entry"]["duration"] = Duration;
+      doc["time_entry"]["start"] = Start;
+      doc["time_entry"]["pid"] = PID;
+      doc["time_entry"]["created_with"] = CreatedWith;
+      
+      serializeJson(doc, payload);
+      
+      https.POST(payload);
+      doc.clear();
+      
+      payload = https.getString();   
+      deserializeJson(doc, payload);
+      
+      String TimeID = doc["data"]["id"];
+
+      doc.clear();
+      doc.garbageCollect();
+      
+      return TimeID;
+  }  
+}
+
+
+String Toggl::CreateTag(String const& Name, int const& WID){
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+      String payload;
+           
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
       
@@ -157,11 +197,16 @@ void Toggl::CreateTag(String const& Name, int const& WID){
       serializeJson(doc, payload);
       
       https.POST(payload);
-      Serial.println(https.getString());
+      payload = https.getString();
+
+      deserializeJson(doc, payload);
+      String output = doc["data"]["id"];
       
       doc.clear();
       doc.garbageCollect();
-
+      
+      return output;
+      
     }
 }
 

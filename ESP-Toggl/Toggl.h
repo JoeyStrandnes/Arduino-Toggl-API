@@ -46,9 +46,10 @@ class Toggl{
     String getWorkSpace();
      
     //POST & PUT requests
-    String StartTimeEntry(String const& Description, String const& Tags, int const& PID, String const& CreatedWith);
-    void   StopTimeEntry(String const& ID);
-    void   CreateTag(String const& Name, int const& WID);
+    String   StartTimeEntry(String const& Description, String const& Tags, int const& PID, String const& CreatedWith);
+    void     StopTimeEntry(String const& ID);
+    String   CreateTag(String const& Name, int const& WID);
+    String   CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith);
 
     //General functionality
     void init(String const& SSID, String const& PASS);
