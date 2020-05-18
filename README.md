@@ -46,7 +46,7 @@ init(String const& SSID, String const& PASS); //Starts WiFi connection
 setAuth(String const Token);                  //Creates Basic authentication key
 ```
 
-# Used packages (Must be installed on computer)
+# Dependencies (Must be installed on computer)
 ```c++
 ArduinoJson
 ESP8266WiFi
