@@ -43,14 +43,16 @@ class Toggl{
     const String    getCreation();
     const String    getTimezone();
     
-    String getWorkSpace();
+    const String getWorkSpace();
+   
      
     //POST & PUT requests
-    String   StartTimeEntry(String const& Description, String const& Tags, int const& PID, String const& CreatedWith);
-    void     StopTimeEntry(String const& ID);
-    String   CreateTag(String const& Name, int const& WID);
-    String   CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith);
-
+    const String    StartTimeEntry(String const& Description, String const& Tags, int const& PID, String const& CreatedWith);
+    void            StopTimeEntry(String const& ID);
+    const String    CreateTag(String const& Name, int const& WID);
+    const String    CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith);
+    //const String    CreateProject(String const Name, int const WID, int const TemplateId, bool const Private, int const CID);
+    
     //General functionality
     void init(String const& SSID, String const& PASS);
     void setAuth(String const Token);
@@ -58,7 +60,7 @@ class Toggl{
     
   private:
 
-    String getUserData(String Input);
+    const String getUserData(String Input);
     String AuthorizationKey{};
 
   

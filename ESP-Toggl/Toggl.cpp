@@ -38,11 +38,13 @@ void Toggl::init(String const& SSID, String const& PASS){
 }
 
 
-String Toggl::getUserData(String Input){
+const String Toggl::getUserData(String Input){
 
   if ((WiFi.status() == WL_CONNECTED)) {
       
       String payload{};
+      String Output{};
+      int16_t HTTP_Code{};
       
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
@@ -51,28 +53,39 @@ String Toggl::getUserData(String Input){
       https.begin(*client, "https://www.toggl.com/api/v8/me");
       https.addHeader("Authorization", AuthorizationKey);
 
-      https.GET();
-      payload = https.getString();
-      https.end();
+      HTTP_Code = https.GET();
+       
+      if (HTTP_Code >= 200 && HTTP_Code <= 226){
+          StaticJsonDocument<128> filter;
+          filter["data"][Input] = true;
+          
+          const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
+          DynamicJsonDocument doc(capacity);
+    
+          deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
+          doc.shrinkToFit();
+          
+          const String TMP_Str = doc["data"][Input];
+          Output = TMP_Str;
+          doc.garbageCollect();
+          filter.garbageCollect();
       
-      const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
-      DynamicJsonDocument doc(capacity);
+      }
 
-      deserializeJson(doc, payload);
-      doc.shrinkToFit();
-      const String Output = doc["data"][Input];
-      doc.clear();
-      doc.garbageCollect();
+      else{ // To return the error instead of the data, no idea why the built in espHttpClient "errorToString" only returns blank space when a known error occurs...
+           Output = ("Error: " + String(HTTP_Code));
+      }
       
-      return Output;
+      https.end();
+      return Output;  
   }
     
 }
 
 
-//POST & PUT request for hadnling the timer
+//POST & PUT request for handling the timer
 
-String Toggl::StartTimeEntry(String const& Description, String const& Tags, int const& PID,String const& CreatedWith){
+const String Toggl::StartTimeEntry(String const& Description, String const& Tags, int const& PID,String const& CreatedWith){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -98,9 +111,8 @@ String Toggl::StartTimeEntry(String const& Description, String const& Tags, int 
       
       https.POST(payload);
       doc.clear();
-      
-      payload = https.getString();   
-      deserializeJson(doc, payload);
+         
+      deserializeJson(doc, https.getString());
       
       String TimeID = doc["data"]["id"];
 
@@ -132,7 +144,7 @@ if ((WiFi.status() == WL_CONNECTED)) {
 }
 
 
-String Toggl::CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith){
+const String Toggl::CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -160,9 +172,8 @@ String Toggl::CreateTimeEntry(String const& Description, String const& Tags, int
       
       https.POST(payload);
       doc.clear();
-      
-      payload = https.getString();   
-      deserializeJson(doc, payload);
+        
+      deserializeJson(doc, https.getString());
       
       String TimeID = doc["data"]["id"];
 
@@ -174,7 +185,7 @@ String Toggl::CreateTimeEntry(String const& Description, String const& Tags, int
 }
 
 
-String Toggl::CreateTag(String const& Name, int const& WID){
+const String Toggl::CreateTag(String const& Name, int const& WID){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -197,9 +208,8 @@ String Toggl::CreateTag(String const& Name, int const& WID){
       serializeJson(doc, payload);
       
       https.POST(payload);
-      payload = https.getString();
-
-      deserializeJson(doc, payload);
+      
+      deserializeJson(doc, https.getString());
       String output = doc["data"]["id"];
       
       doc.clear();
@@ -211,11 +221,12 @@ String Toggl::CreateTag(String const& Name, int const& WID){
 }
 
 
-String Toggl::getWorkSpace(){
+const String Toggl::getWorkSpace(){
   
   if ((WiFi.status() == WL_CONNECTED)) {   
 
       String Output{};
+      uint16_t HTTP_Code{};
       
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
@@ -230,18 +241,78 @@ String Toggl::getWorkSpace(){
       https.begin(*client, "https://www.toggl.com/api/v8/workspaces");
       https.addHeader("Authorization", AuthorizationKey, true);
 
-      https.GET();
-
-      deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
-      https.end();
-      serializeJsonPretty(doc, Output);
-      doc.garbageCollect();
-      filter.garbageCollect();
+      HTTP_Code = https.GET();
       
+      if(HTTP_Code >= 200 && HTTP_Code <= 226){
+        deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
+        serializeJsonPretty(doc, Output);
+        doc.garbageCollect();
+        filter.garbageCollect();
+      }
+
+      else{
+        Output = ("Error: " + String(HTTP_Code));
+      }
+      
+      https.end();
       return Output; 
       
      }
 }
+
+/*
+const String Toggl::CreateProject(String const Name, int const WID, int const TemplateId, bool const Private, int const CID){
+  
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+      String payload{};
+      String ProjectID{};
+      //uint16_t HTTP_Code{};
+      
+      std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+      
+      HTTPClient https;
+      https.begin(*client, "https://www.toggl.com/api/v8/projects");
+      https.addHeader("Authorization", AuthorizationKey, true);
+      https.addHeader("Content-Type", " application/json");
+
+      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
+      DynamicJsonDocument doc(capacity);
+      
+      doc["time_entry"]["name"] = Name;
+      doc["time_entry"]["wid"] = WID;
+      doc["time_entry"]["template_id"] = TemplateId;
+      doc["time_entry"]["is_private"] = Private;
+      doc["time_entry"]["cid"] = CID;
+      
+      serializeJson(doc, payload);
+      
+      const uint16_t HTTP_Code = https.POST(payload);
+      
+      //Serial.println(HTTP_Code);
+
+      doc.clear();
+        
+
+      if(HTTP_Code >= 200 && HTTP_Code <= 226){
+        deserializeJson(doc, https.getString());
+        const String ProjectID = doc["data"]["id"];
+      }
+      
+      else{
+        ProjectID = HTTP_Code;
+      }
+
+      doc.clear();
+      doc.garbageCollect();
+      
+      return ProjectID;
+  }  
+
+}
+*/
+
 
 //ToDo: For all GET requests. Better memory handling
 //GET requests for user Data
