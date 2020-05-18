@@ -36,6 +36,7 @@ getWorkSpace();             //Returns a String of all the workplaces
 ```c++
 StartTimeEntry(String Description, String Tags, int PID, String CreatedWith); // Returns the timer ID as a String
 StopTimeEntry(String ID);
+CreateTimeEntry(String Description, String Tags, int Duration, String Start, int PID, String CreatedWith); // Returns the timer ID as a String
 CreateTag(String Name, int WID); // Requires the Workspace ID
 ```
 
