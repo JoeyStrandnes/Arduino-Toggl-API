@@ -5,21 +5,27 @@ Start a timer with a description "HelloWorld", use the tag "TagName", and create
 
 The timer will be stopped after ~10 seconds
 */
-#include <Toggl.h>
+#define ESP32
 
-String const Token{"API Token"};
+#include "Toggl.h"
 
-String const SSID{"Network SSID"};
-String const PASS{"Password"};
-String const TimerID{};
-int const PID{Project ID};
+
+String const Token{"Token"};
+
+//String const SSID{"SSID"};
+//String const PASS{"PASS"};
+const char* SSID = "SSID";
+const char* PASS = "PASS";
+
+String TimerID{};
+int const PID{"PID"};
 
 Toggl toggl;
 
 void setup(){
 
     Serial.begin(115200);
-    
+
     toggl.init(SSID,PASS);
     toggl.setAuth(Token);
 
@@ -28,7 +34,8 @@ void setup(){
     
     TimerID = (toggl.StartTimeEntry("HelloWorld", "TagName", PID, "ESP"));
     delay(10000);
-    toggl.StopTimeEntry(TimerID);
+    Serial.println(toggl.StopTimeEntry(TimerID));
+  
 }
 
 void loop(){
