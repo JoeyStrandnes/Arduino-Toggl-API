@@ -1,18 +1,20 @@
 # Arduino-Toggl-API
-Port of Toggls official API V8
-https://github.com/toggl/toggl_api_docs
 
-***Only the most used API features are implemented***
+![Passing](https://img.shields.io/badge/build-passing-brightgreen)![GitHub last commit](https://img.shields.io/github/last-commit/JoeyStrandnes/Arduino-Toggl-API)![GitHub issues](https://img.shields.io/github/issues/JoeyStrandnes/Arduino-Toggl-API)
+
+****
+
+Port of Toggl's official API V8 https://github.com/toggl/toggl_api_docs
+
+***Most used API features are implemented***
 
 This more of a learning exercise for me so take all the code with a grain of salt.
-The code is written for the ESP8266 but can easily be ported to the ESP32. Will do so when I have access to an ESP32.
 
-This code is heavily "work in progress" and not complete, it’s not optimized.
+There is lots of room for optimization and improvement.
 
-* GET "User details" is implemented
-* Some PUT/POST have been implemented 
 
-# GET
+
+# Get User Details
 ```c++
 getID();                    //Returns ID as integer
 getApiToken();              //Returns API Token as String
@@ -32,10 +34,10 @@ getCreation();              //Returns Account creation date as String
 getTimezone();              //Returns Time zone as string
 getWorkSpace();             //Returns a String of all the workplaces
 ```
-# PUT & POST
+# Create/Start Time Entries
 ```c++
-StartTimeEntry(String Description, String Tags, int PID, String CreatedWith); // Returns the timer ID as a String
-StopTimeEntry(String ID);
+StartTimeEntry(String Description, String Tags, int PID, String CreatedWith); 	// Returns the timer ID as a String
+StopTimeEntry(String ID);													  	//Returns HTTP error in form of string
 CreateTimeEntry(String Description, String Tags, int Duration, String Start, int PID, String CreatedWith); // Returns the timer ID as a String
 CreateTag(String Name, int WID); // Requires the Workspace ID
 ```
@@ -47,13 +49,20 @@ setAuth(String const Token);                  //Creates Basic authentication key
 ```
 
 # Dependencies (Must be installed on computer)
-```c++
+```markdown
 ArduinoJson
 ESP8266WiFi
 ESP8266HTTPClient
 WiFiClientSecureBearSSL
+ESP32 default libraries
+   
 ```
 # Example
+
+### Print username and time zone to the terminal
+
+### Starts a timer that lasts ~10s
+
 ```c++
 /*
 This example will:
@@ -62,21 +71,36 @@ Start a timer with a description "HelloWorld", use the tag "TagName", and create
 
 The timer will be stopped after ~10 seconds
 */
-#include "Toggl.h"
 
-String const Token{"API Token"};
+#include <Toggl.h>
 
-String const SSID{"Network SSID"};
-String const PASS{"Password"};
-String const TimerID{};
-int const PID{Project ID};
+#if defined (ESP8266)         							//Use String for ESP8266
+
+String const SSID{"SSID"};
+String const PASS{"PASSWORD"};
+
+#elif defined(ESP32)         	 						//Use char* for ESP32
+
+const char* SSID = "SSID";
+const char* PASS = "PASSWORD";
+
+#else
+#error "ERROR: Processor not defined"
+
+#endif
+/*****************************************************/
+
+String TimerID{};
+int const PID{123456789};                               //Project ID is specific to each user project
+String const Token{"Token"}; 							//API Token is found in "Profile Settings" 
+
 
 Toggl toggl;
 
 void setup(){
 
     Serial.begin(115200);
-    
+
     toggl.init(SSID,PASS);
     toggl.setAuth(Token);
 
@@ -85,11 +109,13 @@ void setup(){
     
     TimerID = (toggl.StartTimeEntry("HelloWorld", "TagName", PID, "ESP"));
     delay(10000);
-    toggl.StopTimeEntry(TimerID);
+    Serial.println(toggl.StopTimeEntry(TimerID));
+  
 }
 
 void loop(){
 
 }
+
 
 ```
