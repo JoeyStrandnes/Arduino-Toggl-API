@@ -1,8 +1,10 @@
-# Arduino-Toggl-API
+# Arduino Toggl API
 
 ![Passing](https://img.shields.io/badge/build-passing-brightgreen)![GitHub last commit](https://img.shields.io/github/last-commit/JoeyStrandnes/Arduino-Toggl-API)![GitHub issues](https://img.shields.io/github/issues/JoeyStrandnes/Arduino-Toggl-API)
 
-****
+![Banner](https://i.imgur.com/Mr9Amfs.png)
+
+
 
 Port of Toggl's official API V8 https://github.com/toggl/toggl_api_docs
 
