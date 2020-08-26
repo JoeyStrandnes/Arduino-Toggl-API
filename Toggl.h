@@ -1,5 +1,5 @@
 /*
- * Arduino ESP8266 Toggl TEST
+ * Arduino ESP8266 & ESP32 Toggl API v8 Port
  * Using ArduinoJson Version 6
  * Using Toggl API v8
  * https://github.com/toggl/toggl_api_docs/blob/master/toggl_api.md
@@ -12,17 +12,17 @@
 #include <ArduinoJson.h>
 
 
-
-# if defined (ESP8266)
 // Dependencies for ESP8266
+# if defined (ESP8266)
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
 #include "base64.h"
 
-# elif defined(ESP32)
 // Dependencies for ESP32
+# elif defined(ESP32)
+
 #include "WiFi.h"
 #include <HTTPClient.h>
 #include <base64.h>

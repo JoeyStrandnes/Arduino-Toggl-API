@@ -1,5 +1,3 @@
-
-
 #include "Toggl.h"
 
 
@@ -130,7 +128,7 @@ const String Toggl::StartTimeEntry(String const& Description, String const& Tags
 }
 
 
-String Toggl::StopTimeEntry(String const& ID){
+const String Toggl::StopTimeEntry(String const& ID){
 
 if ((WiFi.status() == WL_CONNECTED)) {
 
