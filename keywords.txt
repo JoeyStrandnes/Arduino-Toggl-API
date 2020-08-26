@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map
+# Syntax Coloring Map For Toggl v8
 #######################################
 
 #######################################
@@ -11,6 +11,7 @@ Toggl	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
+
 getID	KEYWORD2
 getApiToken	KEYWORD2
 getDefaultWid	KEYWORD2
@@ -26,12 +27,13 @@ getLang	KEYWORD2
 getDurationFormat	KEYWORD2
 getAt	KEYWORD2
 getCreation	KEYWORD2
-getTimezone	KEYWORD2
+getTimezone
 getWorkSpace	KEYWORD2
 
 StartTimeEntry	KEYWORD2
 StopTimeEntry	KEYWORD2
+CreateTimeEntry	KEYWORD2
 CreateTag	KEYWORD2
-setAuth	KEYWORD2
 
-#######################################
+init	KEYWORD2
+setAuth	KEYWORD2
