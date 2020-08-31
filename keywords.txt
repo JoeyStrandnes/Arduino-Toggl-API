@@ -27,7 +27,7 @@ getLang	KEYWORD2
 getDurationFormat	KEYWORD2
 getAt	KEYWORD2
 getCreation	KEYWORD2
-getTimezone
+getTimezone	KEYWORD2
 getWorkSpace	KEYWORD2
 
 StartTimeEntry	KEYWORD2

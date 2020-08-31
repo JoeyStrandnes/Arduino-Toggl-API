@@ -6,27 +6,14 @@ Start a timer with a description "HelloWorld", use the tag "TagName", and create
 The timer will be stopped after ~10 seconds
 */
 
-#include <Toggl.h>
-
-#if defined (ESP8266)         							//Use String for ESP8266
-
-String const SSID{"SSID"};
-String const PASS{"PASSWORD"};
-
-#elif defined(ESP32)         	 						//Use char* for ESP32
+#include "Toggl.h"
 
 const char* SSID = "SSID";
 const char* PASS = "PASSWORD";
 
-#else
-#error "ERROR: Processor not defined"
-
-#endif
-/*****************************************************/
-
 String TimerID{};
-int const PID{123456789};                               //Project ID is specific to each user project
-String const Token{"Token"}; 							//API Token is found in "Profile Settings" 
+int const PID{123456789};                 //Project ID is specific to each user project
+String const Token{"TOKEN"};               //API Token is found in "Profile Settings" 
 
 
 Toggl toggl;

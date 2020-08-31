@@ -46,16 +46,14 @@ CreateTag(String Name, int WID); // Requires the Workspace ID
 
 # General Setup
 ```c++
-init(String const& SSID, String const& PASS); //Starts WiFi connection
-setAuth(String const Token);                  //Creates Basic authentication key
+init(const char* SSID, const char* PASS); 	//Starts WiFi connection
+setAuth(String const Token);                //Creates Basic authentication key
 ```
 
 # Dependencies (Must be installed on computer)
 ```markdown
 ArduinoJson
-ESP8266WiFi
-ESP8266HTTPClient
-WiFiClientSecureBearSSL
+ESP8266 default libraries
 ESP32 default libraries
    
 ```
@@ -76,21 +74,9 @@ The timer will be stopped after ~10 seconds
 
 #include <Toggl.h>
 
-#if defined (ESP8266)         							//Use String for ESP8266
-
-String const SSID{"SSID"};
-String const PASS{"PASSWORD"};
-
-#elif defined(ESP32)         	 						//Use char* for ESP32
 
 const char* SSID = "SSID";
 const char* PASS = "PASSWORD";
-
-#else
-#error "ERROR: Processor not defined"
-
-#endif
-/*****************************************************/
 
 String TimerID{};
 int const PID{123456789};                               //Project ID is specific to each user project

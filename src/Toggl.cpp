@@ -10,8 +10,10 @@ Toggl::Toggl(){
 
 #if defined (ESP8266)
 
-void Toggl::init(String const& SSID, String const& PASS){
+void Toggl::init(const char* NAME,const char* PASSWORD){
 
+  String SSID{NAME};
+  String PASS{PASSWORD};
 
   WiFi.begin(SSID, PASS);
 

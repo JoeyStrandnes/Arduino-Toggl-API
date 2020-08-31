@@ -66,7 +66,6 @@ class Toggl{
     const String    CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith);
     
     //General functionality
-    void init(String const& SSID, String const& PASS);
     void init(const char* SSID,const char* PASS);
     void setAuth(String const& Token);
 
