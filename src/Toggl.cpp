@@ -239,7 +239,8 @@ const String Toggl::getWorkSpace(){
 
       String Output{};
       uint16_t HTTP_Code{};
-
+      uint8_t Counter{};
+      
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
 
@@ -257,7 +258,23 @@ const String Toggl::getWorkSpace(){
 
       if(HTTP_Code >= 200 && HTTP_Code <= 226){
         deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
-        serializeJsonPretty(doc, Output);
+        
+        JsonArray arr = doc.as<JsonArray>();
+
+        for (JsonVariant value : arr) {
+    		
+      		Output += value.as<char*>();
+      		Output += "\n";
+          Counter++;
+          if(Counter == 2)
+          {
+            Output += "\n";
+            Counter = 0;
+          }
+		    }
+
+
+        //serializeJsonPretty(doc, Output);
         doc.garbageCollect();
         filter.garbageCollect();
       }
