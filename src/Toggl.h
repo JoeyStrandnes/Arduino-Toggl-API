@@ -57,7 +57,7 @@ class Toggl{
     const String    getTimezone();
 
     const String    getWorkSpace();
-
+    const String    getProject(String const& WID);
 
     //POST & PUT requests
     const String    StartTimeEntry(String const& Description, String const& Tags, int const& PID, String const& CreatedWith);
