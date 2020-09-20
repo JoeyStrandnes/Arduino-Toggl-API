@@ -271,7 +271,6 @@ const String Toggl::getProject(String const& WID){
       StaticJsonDocument<50> filter;
       filter[0]["id"] = true;
       filter[0]["name"] = true;
-
       HTTPClient https;
       https.begin("https://api.track.toggl.com/api/v8/workspaces/" + WID + "/projects", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
@@ -309,6 +308,110 @@ const String Toggl::getProject(String const& WID){
      }
 }
 
+
+const String  Toggl::getTimerData(String Input){
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+      String payload{};
+      String Output{};
+      int16_t HTTP_Code{};
+
+      HTTPClient https;
+      https.begin("https://api.track.toggl.com/api/v8/time_entries/current",Fingerprint);
+      https.addHeader("Authorization", AuthorizationKey);
+      
+      HTTP_Code = https.GET();
+
+      if (HTTP_Code >= 200 && HTTP_Code <= 226){
+          StaticJsonDocument<50> filter;
+          filter["data"][Input] = true;
+
+          const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
+          DynamicJsonDocument doc(capacity);
+
+          deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
+          doc.shrinkToFit();
+
+          const String TMP_Str = doc["data"][Input];
+          Output = TMP_Str;
+          doc.garbageCollect();
+          filter.garbageCollect();
+
+      }
+
+      else{ // To return the error instead of the data, no idea why the built in espHttpClient "errorToString" only returns blank space when a known error occurs...
+           Output = ("Error: " + String(HTTP_Code));
+      }
+
+      https.end();
+      return Output;
+  }
+}
+
+//This got to go...
+const uint32_t  Toggl::getCurrentTime(String Timezone){
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+      int16_t HTTP_Code{};
+      uint32_t Output{};
+      HTTPClient http;
+      http.begin("http://worldtimeapi.org/api/timezone/" + Timezone);
+    
+      HTTP_Code = http.GET();
+      
+      if (HTTP_Code >= 200 && HTTP_Code <= 226){
+          StaticJsonDocument<50> filter;
+          filter["unixtime"] = true;
+
+          const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
+          DynamicJsonDocument doc(capacity);
+
+          deserializeJson(doc, http.getString(), DeserializationOption::Filter(filter));
+          doc.shrinkToFit();
+
+          Output = doc["unixtime"];
+          doc.garbageCollect();
+          filter.garbageCollect();
+
+      }
+
+      else{
+        HTTP_Code;
+      }
+
+      http.end();
+      return Output;
+      }
+}
+
+
+/*
+ * Since the duration is in the epoch time format i need to convert it to regular secconds.
+ * This is done by taking "current time" + "Duration" resulting in duration in secconds.  
+ * 
+ * The JSON request for getting the time when the timer started does not include the time zone....
+ * 
+ * This function makes me cry :'(
+ */
+
+//Not even sure if i can do this properly. Il just use the World Time API for now...
+const int32_t Toggl::getTimerDuration(){
+
+  uint32_t Output = getCurrentTime(getTimezone());
+  const int32_t Duration = (getTimerData("duration")).toInt();
+  Output += Duration;
+
+  return Output;
+}
+
+
+const String Toggl::getTimerStart(){
+
+  return (getTimerData("start"));
+  
+};
 
 //ToDo: For all GET requests. Better memory handling
 //GET requests for user Data
