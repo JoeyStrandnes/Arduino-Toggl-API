@@ -10,11 +10,9 @@ Toggl::Toggl(){
 
 void Toggl::init(const char* SSID,const char* PASS){
 
-  
   WiFi.begin(SSID, PASS);
 
   while(WiFi.status() != WL_CONNECTED){
-    WiFi.localIP().toString();
     delay(100);
   }
 
@@ -47,23 +45,21 @@ const String Toggl::getUserData(String Input){
       HTTP_Code = https.GET();
 
       if (HTTP_Code >= 200 && HTTP_Code <= 226){
-          StaticJsonDocument<128> filter;
+          StaticJsonDocument<80> filter;
           filter["data"][Input] = true;
 
-          const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
-          DynamicJsonDocument doc(capacity);
-
+          DynamicJsonDocument doc(2*JSON_OBJECT_SIZE(1) + 60);
           deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
-          doc.shrinkToFit();
 
-          const String TMP_Str = doc["data"][Input];
+          String TMP_Str = doc["data"][Input];
           Output = TMP_Str;
+          
           doc.garbageCollect();
           filter.garbageCollect();
 
       }
 
-      else{ // To return the error instead of the data, no idea why the built in espHttpClient "errorToString" only returns blank space when a known error occurs...
+      else{ 
            Output = ("Error: " + String(HTTP_Code));
       }
 
@@ -78,15 +74,13 @@ const String Toggl::StartTimeEntry(String const& Description, String const& Tags
   if ((WiFi.status() == WL_CONNECTED)) {
 
       String payload;
-
       
       HTTPClient https;
       https.begin("https://www.toggl.com/api/v8/time_entries/start", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
-      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
-      DynamicJsonDocument doc(capacity);
+      DynamicJsonDocument doc(JSON_ARRAY_SIZE(1) +JSON_OBJECT_SIZE(5 + 1));
 
       doc["time_entry"]["description"] = Description;
       doc["time_entry"]["tags"] = Tags;
@@ -114,6 +108,8 @@ const String Toggl::StartTimeEntry(String const& Description, String const& Tags
 
 const String Toggl::StopTimeEntry(String const& ID){
 
+  String Output{};
+  
   if ((WiFi.status() == WL_CONNECTED)) {
 
       HTTPClient https;
@@ -121,17 +117,17 @@ const String Toggl::StopTimeEntry(String const& ID){
       
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
-      String TMP{String(https.PUT(" "))};
+      Output = String(https.PUT(" "));
       https.end();
       
-      return TMP;
       //return https.errorToString(https.PUT(" ")); // Not sure why it never returns anything, just a blank
 
       }
 
   else{
-    return "Not connected to the internet";
+    Output = "Not connected to the internet";
   }
+  return Output;
 }
 
 
@@ -146,8 +142,7 @@ const String Toggl::CreateTimeEntry(String const& Description, String const& Tag
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
-      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
-      DynamicJsonDocument doc(capacity);
+      DynamicJsonDocument doc(JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(6)+ 50);
 
       doc["time_entry"]["description"] = Description;
       doc["time_entry"]["tags"] = Tags;
@@ -160,9 +155,9 @@ const String Toggl::CreateTimeEntry(String const& Description, String const& Tag
 
       https.POST(payload);
       doc.clear();
-
+      
       deserializeJson(doc, https.getString());
-
+            
       String TimeID = doc["data"]["id"];
 
       doc.clear();
@@ -184,9 +179,8 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
       https.begin("https://www.toggl.com/api/v8/tags", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
-
-      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
-      DynamicJsonDocument doc(capacity);
+      
+      DynamicJsonDocument doc(JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(3));
 
       doc["tag"]["name"] = Name;
       doc["tag"]["wid"] = WID;
@@ -324,14 +318,12 @@ const String  Toggl::getTimerData(String Input){
       HTTP_Code = https.GET();
 
       if (HTTP_Code >= 200 && HTTP_Code <= 226){
-          StaticJsonDocument<50> filter;
+          StaticJsonDocument<46> filter;
           filter["data"][Input] = true;
 
-          const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
-          DynamicJsonDocument doc(capacity);
+          DynamicJsonDocument doc(JSON_OBJECT_SIZE(4));
 
           deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
-          doc.shrinkToFit();
 
           const String TMP_Str = doc["data"][Input];
           Output = TMP_Str;
@@ -357,19 +349,19 @@ const uint32_t  Toggl::getCurrentTime(String Timezone){
       int16_t HTTP_Code{};
       uint32_t Output{};
       HTTPClient http;
+      
       http.begin("http://worldtimeapi.org/api/timezone/" + Timezone);
     
       HTTP_Code = http.GET();
       
       if (HTTP_Code >= 200 && HTTP_Code <= 226){
-          StaticJsonDocument<50> filter;
+          StaticJsonDocument<21> filter;
           filter["unixtime"] = true;
 
-          const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
+          const size_t capacity = JSON_OBJECT_SIZE(2);
           DynamicJsonDocument doc(capacity);
 
           deserializeJson(doc, http.getString(), DeserializationOption::Filter(filter));
-          doc.shrinkToFit();
 
           Output = doc["unixtime"];
           doc.garbageCollect();
@@ -389,7 +381,7 @@ const uint32_t  Toggl::getCurrentTime(String Timezone){
 
 /*
  * Since the duration is in the epoch time format i need to convert it to regular secconds.
- * This is done by taking "current time" + "Duration" resulting in duration in secconds.  
+ * This is done by taking "current time" + "Duration" resulting in duration in secconds. 
  * 
  * The JSON request for getting the time when the timer started does not include the time zone....
  * 
@@ -398,11 +390,18 @@ const uint32_t  Toggl::getCurrentTime(String Timezone){
 
 //Not even sure if i can do this properly. Il just use the World Time API for now...
 const int32_t Toggl::getTimerDuration(){
-
-  uint32_t Output = getCurrentTime(getTimezone());
+  
+  uint32_t Output{};
   const int32_t Duration = (getTimerData("duration")).toInt();
-  Output += Duration;
 
+  if (Duration < 0){
+    Output = getCurrentTime(getTimezone()) + Duration;
+  }
+
+  else{
+    Output = 0;
+  }
+  
   return Output;
 }
 
