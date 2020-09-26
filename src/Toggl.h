@@ -66,6 +66,8 @@ class Toggl{
     const String    CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith);
     const int32_t   getTimerDuration();
     const String    getTimerStart();
+    const bool      isTimerActive();
+    
     
     //General functionality
     void init(const char* SSID,const char* PASS);
@@ -74,7 +76,7 @@ class Toggl{
 
   private:
 
-    const uint32_t  getCurrentTime(String Timezone);
+    const uint32_t  getCurrentTime(const String Timezone);
     const String    getUserData(String Input);
     const String    getTimerData(String Input);
     String          AuthorizationKey{};

@@ -342,7 +342,7 @@ const String  Toggl::getTimerData(String Input){
 }
 
 //This got to go...
-const uint32_t  Toggl::getCurrentTime(String Timezone){
+const uint32_t  Toggl::getCurrentTime(const String Timezone){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -437,6 +437,24 @@ const uint16_t Toggl::getDefaultWid(){
     return output;
 
 }
+
+const bool Toggl::isTimerActive(){
+
+  bool output;
+  
+  String wid = getTimerData("wid"); //Just using a filter for less data.
+
+  if(wid != "null"){
+    output = true;
+  }
+  
+  else{
+    output = false;
+  }
+  
+  return output;
+}
+
 
 
 const String Toggl::getEmail(){
