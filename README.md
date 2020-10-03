@@ -37,27 +37,37 @@ getTimezone();              //Returns Time zone as string
 getWorkSpace();             //Returns a String of all the workplaces
 ```
 # Create/Start Time Entries
+
 ```c++
 StartTimeEntry(String Description, String Tags, int PID, String CreatedWith); 	// Returns the timer ID as a String
-StopTimeEntry(String ID);													  	//Returns HTTP error in form of string
+StopTimeEntry(String ID);	//Returns HTTP error in form of string
 CreateTimeEntry(String Description, String Tags, int Duration, String Start, int PID, String CreatedWith); // Returns the timer ID as a String
-CreateTag(String Name, int WID); // Requires the Workspace ID
 ```
 
+# Misc
+
+```c++
+getWorkSpace(); 					// Returns a "pretty" string of all workspaces and ID's
+getProject(int const& WID); 		// Returns a "pretty" string of all project is specific workplace
+CreateTag(String Name, int WID); 	// Requires the Workspace ID
+```
+
+
+
 # General Setup
+
 ```c++
 init(const char* SSID, const char* PASS); 	//Starts WiFi connection
 setAuth(String const Token);                //Creates Basic authentication key
 ```
 
-# Dependencies (Must be installed on computer)
+# Dependencies
 ```markdown
-ArduinoJson
+ArduinoJson v6
 ESP8266 default libraries
 ESP32 default libraries
-   
 ```
-# Example
+# Examples
 
 ### Print username and time zone to the terminal
 
@@ -67,7 +77,7 @@ ESP32 default libraries
 /*
 This example will:
 Print the Username and Time zone to the terminal.
-Start a timer with a description "HelloWorld", use the tag "TagName", and created by "ESP". The PID must be collected by the user at the moment.
+Start a timer with a description "HelloWorld", use the tag "TagName", and created by "ESP".
 
 The timer will be stopped after ~10 seconds
 */

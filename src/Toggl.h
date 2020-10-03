@@ -34,7 +34,6 @@
 
 class Toggl{
 
-
   public:
     Toggl();
 
@@ -56,14 +55,19 @@ class Toggl{
     const String    getCreation();
     const String    getTimezone();
 
+    //Misc
     const String    getWorkSpace();
-
-
-    //POST & PUT requests
+    const String    getProject(int const& WID);
+    //const int       getPID(String const& WID ,String const& ProjectName);
+    const String    CreateTag(String const& Name, int const& WID);
+    
+    //Timer related functions
     const String    StartTimeEntry(String const& Description, String const& Tags, int const& PID, String const& CreatedWith);
     const String    StopTimeEntry(String const& ID);
-    const String    CreateTag(String const& Name, int const& WID);
     const String    CreateTimeEntry(String const& Description, String const& Tags, int const& Duration, String const& Start,  int const& PID, String const& CreatedWith);
+    const int32_t   getTimerDuration();
+    const bool      isTimerActive();
+    
     
     //General functionality
     void init(const char* SSID,const char* PASS);
@@ -72,10 +76,11 @@ class Toggl{
 
   private:
 
-    const String  getUserData(String Input);
-    String        AuthorizationKey{};
-    const char*   Fingerprint{"51240ac662cb06319ca77b133a9de73f6ba789bf"};  // Fingerprint for Toggle API, expires on 01/10/2021
-
+    const uint32_t  getCurrentTime(const String Timezone);
+    const String    getUserData(String Input);
+    const String    getTimerData(String Input);
+    String          AuthorizationKey{};
+    const char*     Fingerprint{"51240ac662cb06319ca77b133a9de73f6ba789bf"};  // Fingerprint for Toggle API, expires on 01/10/2021
 
 };
 
