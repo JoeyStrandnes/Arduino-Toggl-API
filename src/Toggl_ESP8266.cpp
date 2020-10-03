@@ -283,7 +283,7 @@ const String Toggl::getWorkSpace(){
 
 
 // Need to solve the address problem..
-const String Toggl::getProject(String const& WID){
+const String Toggl::getProject(int const& WID){
 
   
   if ((WiFi.status() == WL_CONNECTED)) {
@@ -301,7 +301,7 @@ const String Toggl::getProject(String const& WID){
       client->setFingerprint(Fingerprint);
       
       HTTPClient https;
-      https.begin(*client, "https://toggl.com/api/v8/workspaces/" + WID + "/projects"); // I have no ide why the new API "https://api.track.toggl.com/api/v8/workspaces/{workspace_id}/projects" doesnt work but the old one does. It works on the ESP32
+      https.begin(*client, "https://toggl.com/api/v8/workspaces/" + String(WID) + "/projects"); // I have no ide why the new API "https://api.track.toggl.com/api/v8/workspaces/{workspace_id}/projects" doesnt work but the old one does. It works on the ESP32
       https.addHeader("Authorization", AuthorizationKey);
 
       HTTP_Code = https.GET();
@@ -358,9 +358,8 @@ const String  Toggl::getTimerData(String Input){
           filter["data"][Input] = true;
 
           DynamicJsonDocument doc(JSON_OBJECT_SIZE(4));
-
+          
           deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
-
           const String TMP_Str = doc["data"][Input];
           Output = TMP_Str;
           doc.garbageCollect();
@@ -441,12 +440,6 @@ const int32_t Toggl::getTimerDuration(){
   return Output;
 }
 
-
-const String Toggl::getTimerStart(){
-
-  return (getTimerData("start"));
-  
-};
 
 const bool Toggl::isTimerActive(){
 

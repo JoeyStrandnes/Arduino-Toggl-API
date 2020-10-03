@@ -251,7 +251,7 @@ const String Toggl::getWorkSpace(){
 }
 
 
-const String Toggl::getProject(String const& WID){
+const String Toggl::getProject(int const& WID){
   
   if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -264,7 +264,7 @@ const String Toggl::getProject(String const& WID){
       filter[0]["id"] = true;
       filter[0]["name"] = true;
       HTTPClient https;
-      https.begin("https://api.track.toggl.com/api/v8/workspaces/" + WID + "/projects", Fingerprint);
+      https.begin("https://api.track.toggl.com/api/v8/workspaces/" + String(WID) + "/projects", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
 
       HTTP_Code = https.GET();
@@ -417,13 +417,6 @@ const int32_t Toggl::getTimerDuration(){
   
   return Output;
 }
-
-
-const String Toggl::getTimerStart(){
-
-  return (getTimerData("start"));
-  
-};
 
 const bool Toggl::isTimerActive(){
 
