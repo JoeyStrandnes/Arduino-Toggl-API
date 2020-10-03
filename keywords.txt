@@ -34,6 +34,9 @@ StartTimeEntry	KEYWORD2
 StopTimeEntry	KEYWORD2
 CreateTimeEntry	KEYWORD2
 CreateTag	KEYWORD2
+getTimerDuration	KEYWORD2
+isTimerActive	KEYWORD2
+getProject	KEYWORD2
 
 init	KEYWORD2
 setAuth	KEYWORD2
