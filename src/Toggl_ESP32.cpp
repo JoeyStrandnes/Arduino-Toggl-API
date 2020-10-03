@@ -209,12 +209,6 @@ const String Toggl::getWorkSpace(){
       String Output{};
       uint16_t HTTP_Code{};
       
-      DynamicJsonDocument doc(1024);
-
-      StaticJsonDocument<50> filter;
-      filter[0]["id"] = true;
-      filter[0]["name"] = true;
-
       HTTPClient https;
       https.begin("https://www.toggl.com/api/v8/workspaces", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
@@ -222,12 +216,16 @@ const String Toggl::getWorkSpace(){
       HTTP_Code = https.GET();
 
       if(HTTP_Code >= 200 && HTTP_Code <= 226){
+
+        DynamicJsonDocument doc(1024);
+  
+        StaticJsonDocument<50> filter;
+        filter[0]["id"] = true;
+        filter[0]["name"] = true;
         
         deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
-        
-        
+              
         JsonArray arr = doc.as<JsonArray>();
-
 
         for (JsonVariant value : arr) {        
           
@@ -302,6 +300,21 @@ const String Toggl::getProject(String const& WID){
      }
 }
 
+/*
+//ToDo make the code somewhat nicer.
+const int Toggl::getPID(String const& WID ,String const& ProjectName){
+
+  int output{};
+  
+  String TMP_String = getProject(WID);
+
+  Serial.println(TMP_String);
+  
+
+  
+  return output;
+}
+*/
 
 const String  Toggl::getTimerData(String Input){
 
@@ -412,6 +425,24 @@ const String Toggl::getTimerStart(){
   
 };
 
+const bool Toggl::isTimerActive(){
+
+  bool output;
+  
+  String wid = getTimerData("wid"); //Just using a filter for less data.
+
+  if(wid != "null"){
+    output = true;
+  }
+  
+  else{
+    output = false;
+  }
+  
+  return output;
+}
+
+
 //ToDo: For all GET requests. Better memory handling
 //GET requests for user Data
 
@@ -437,25 +468,6 @@ const uint16_t Toggl::getDefaultWid(){
     return output;
 
 }
-
-const bool Toggl::isTimerActive(){
-
-  bool output;
-  
-  String wid = getTimerData("wid"); //Just using a filter for less data.
-
-  if(wid != "null"){
-    output = true;
-  }
-  
-  else{
-    output = false;
-  }
-  
-  return output;
-}
-
-
 
 const String Toggl::getEmail(){
 

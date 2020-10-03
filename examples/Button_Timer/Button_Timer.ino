@@ -1,8 +1,6 @@
 /*
 Uses a momentary button to start a time entry and light a LED. 
-The Timer will stop when teh button is pressed a seccond time.
-
-Only for ESP8266
+The Timer will stop when the button is pressed a seccond time.
 */
 
 #include <Toggl.h>
@@ -31,15 +29,13 @@ Toggl toggl;
 
 void setup(){
 
-    Serial.begin(115200);
-
-    pinMode(ledPin, OUTPUT);
-    pinMode(buttonPin, INPUT);
-
-    attachInterrupt(digitalPinToInterrupt(buttonPin), handleInterrupt, FALLING);
-    
-    toggl.init(SSID,PASS);
-    toggl.setAuth(Token);
+  pinMode(ledPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
+  
+  attachInterrupt(digitalPinToInterrupt(buttonPin), handleInterrupt, FALLING); // Triggers on falling edge, change it to "RISING" depending on your button.
+  
+  toggl.init(SSID,PASS);
+  toggl.setAuth(Token);
     
 }
 
@@ -68,6 +64,4 @@ void loop(){
     BUTTON = false;
     delay(1000);
   }
-
-  
 }

@@ -58,6 +58,7 @@ class Toggl{
     //Misc
     const String    getWorkSpace();
     const String    getProject(String const& WID);
+    //const int       getPID(String const& WID ,String const& ProjectName);
     const String    CreateTag(String const& Name, int const& WID);
     
     //Timer related functions
@@ -81,7 +82,6 @@ class Toggl{
     const String    getTimerData(String Input);
     String          AuthorizationKey{};
     const char*     Fingerprint{"51240ac662cb06319ca77b133a9de73f6ba789bf"};  // Fingerprint for Toggle API, expires on 01/10/2021
-
 
 };
 

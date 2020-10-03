@@ -8,8 +8,6 @@ Toggl::Toggl(){
 }
 
 
-
-
 void Toggl::init(const char* NAME,const char* PASSWORD){
 
   String SSID{NAME};
@@ -51,7 +49,7 @@ const String Toggl::getUserData(String Input){
       int16_t HTTP_Code{};
 
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
 
       HTTPClient https;
       https.begin(*client, "https://www.toggl.com/api/v8/me");
@@ -59,20 +57,18 @@ const String Toggl::getUserData(String Input){
 
       HTTP_Code = https.GET();
 
-      if (HTTP_Code >= 200 && HTTP_Code <= 226){
-          StaticJsonDocument<128> filter;
-          filter["data"][Input] = true;
-
-          const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(7) + JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(24) + 850;
-          DynamicJsonDocument doc(capacity);
-
-          deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
-          doc.shrinkToFit();
-
-          const String TMP_Str = doc["data"][Input];
-          Output = TMP_Str;
-          doc.garbageCollect();
-          filter.garbageCollect();
+      if (HTTP_Code >= 200 && HTTP_Code <= 226){  
+        StaticJsonDocument<80> filter;
+        filter["data"][Input] = true;
+    
+        DynamicJsonDocument doc(2*JSON_OBJECT_SIZE(1) + 60);
+        deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
+    
+        String TMP_Str = doc["data"][Input];
+        Output = TMP_Str;
+        
+        doc.garbageCollect();
+        filter.garbageCollect();
 
       }
 
@@ -96,15 +92,14 @@ const String Toggl::StartTimeEntry(String const& Description, String const& Tags
       String payload;
 
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
 
       HTTPClient https;
       https.begin(*client, "https://www.toggl.com/api/v8/time_entries/start");
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
-      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
-      DynamicJsonDocument doc(capacity);
+      DynamicJsonDocument doc(JSON_ARRAY_SIZE(1) +JSON_OBJECT_SIZE(5 + 1));
 
       doc["time_entry"]["description"] = Description;
       doc["time_entry"]["tags"] = Tags;
@@ -132,10 +127,11 @@ const String Toggl::StartTimeEntry(String const& Description, String const& Tags
 
 const String Toggl::StopTimeEntry(String const& ID){
 
+String Output{};
 if ((WiFi.status() == WL_CONNECTED)) {
 
   std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-  client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+  client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
 
   HTTPClient https;
   https.begin(*client, "https://www.toggl.com/api/v8/time_entries/" + ID +"/stop");
@@ -144,13 +140,14 @@ if ((WiFi.status() == WL_CONNECTED)) {
   String TMP{String(https.PUT(" "))};
   https.end();
   
-  return TMP;
+  Output = TMP;
      
   }
 
  else{
-  return "Not connected to the internet";
+  Output = "Not connected to the internet";
  }
+ return Output;
 }
 
 
@@ -161,15 +158,14 @@ const String Toggl::CreateTimeEntry(String const& Description, String const& Tag
       String payload;
 
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
 
       HTTPClient https;
       https.begin(*client, "https://www.toggl.com/api/v8/time_entries");
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
-      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
-      DynamicJsonDocument doc(capacity);
+      DynamicJsonDocument doc(JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(6)+ 50);
 
       doc["time_entry"]["description"] = Description;
       doc["time_entry"]["tags"] = Tags;
@@ -182,9 +178,9 @@ const String Toggl::CreateTimeEntry(String const& Description, String const& Tag
 
       https.POST(payload);
       doc.clear();
-
+      
       deserializeJson(doc, https.getString());
-
+            
       String TimeID = doc["data"]["id"];
 
       doc.clear();
@@ -203,15 +199,14 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
       String payload;
 
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
 
       HTTPClient https;
       https.begin(*client, "https://www.toggl.com/api/v8/tags");
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
-      const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 90;
-      DynamicJsonDocument doc(capacity);
+      DynamicJsonDocument doc(JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(3));
 
       doc["tag"]["name"] = Name;
       doc["tag"]["wid"] = WID;
@@ -242,13 +237,9 @@ const String Toggl::getWorkSpace(){
       uint8_t Counter{};
       
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint("51240ac662cb06319ca77b133a9de73f6ba789bf"); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
 
-      DynamicJsonDocument doc(1024);
 
-      StaticJsonDocument<50> filter;
-      filter[0]["id"] = true;
-      filter[0]["name"] = true;
 
       HTTPClient https;
       https.begin(*client, "https://www.toggl.com/api/v8/workspaces");
@@ -257,12 +248,15 @@ const String Toggl::getWorkSpace(){
       HTTP_Code = https.GET();
 
       if(HTTP_Code >= 200 && HTTP_Code <= 226){
+
+        DynamicJsonDocument doc(1024);
+        StaticJsonDocument<50> filter;
+        filter[0]["id"] = true;
+        filter[0]["name"] = true;
         
         deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
-        
-        
+                
         JsonArray arr = doc.as<JsonArray>();
-
 
         for (JsonVariant value : arr) {        
           
@@ -287,6 +281,189 @@ const String Toggl::getWorkSpace(){
      }
 }
 
+
+// Need to solve the address problem..
+const String Toggl::getProject(String const& WID){
+
+  
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+      String Output{};
+      uint16_t HTTP_Code{};
+      
+      DynamicJsonDocument doc(1024);
+
+      StaticJsonDocument<50> filter;
+      filter[0]["id"] = true;
+      filter[0]["name"] = true;
+
+      std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+      client->setFingerprint(Fingerprint);
+      
+      HTTPClient https;
+      https.begin(*client, "https://toggl.com/api/v8/workspaces/" + WID + "/projects"); // I have no ide why the new API "https://api.track.toggl.com/api/v8/workspaces/{workspace_id}/projects" doesnt work but the old one does. It works on the ESP32
+      https.addHeader("Authorization", AuthorizationKey);
+
+      HTTP_Code = https.GET();
+
+      if(HTTP_Code >= 200 && HTTP_Code <= 226){
+        
+        deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
+      
+        JsonArray arr = doc.as<JsonArray>();
+        
+        for (JsonVariant value : arr){        
+
+          const int TmpID{value["id"]};
+          Output += TmpID;
+          Output += "\n";
+          String TmpName = value["name"];
+          Output += TmpName + "\n" + "\n";
+        }
+        doc.garbageCollect();
+        filter.garbageCollect();
+      }
+
+      else{
+        Output = ("Error: " + String(HTTP_Code));
+      }
+
+      https.end();
+      return Output;
+
+     }
+     
+}
+
+
+const String  Toggl::getTimerData(String Input){
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+      String payload{};
+      String Output{};
+      int16_t HTTP_Code{};
+
+      std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+      client->setFingerprint(Fingerprint);
+      
+      HTTPClient https;
+      https.begin(*client, "https://toggl.com/api/v8/time_entries/current");
+      https.addHeader("Authorization", AuthorizationKey);
+      
+      HTTP_Code = https.GET();
+
+      if (HTTP_Code >= 200 && HTTP_Code <= 226){
+          StaticJsonDocument<46> filter;
+          filter["data"][Input] = true;
+
+          DynamicJsonDocument doc(JSON_OBJECT_SIZE(4));
+
+          deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));
+
+          const String TMP_Str = doc["data"][Input];
+          Output = TMP_Str;
+          doc.garbageCollect();
+          filter.garbageCollect();
+
+      }
+
+      else{ // To return the error instead of the data, no idea why the built in espHttpClient "errorToString" only returns blank space when a known error occurs...
+           Output = ("Error: " + String(HTTP_Code));
+      }
+
+      https.end();
+      return Output;
+  }
+}
+
+//This got to go...
+const uint32_t  Toggl::getCurrentTime(const String Timezone){
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+      int16_t HTTP_Code{};
+      uint32_t Output{};
+      HTTPClient http;
+      
+      http.begin("http://worldtimeapi.org/api/timezone/" + Timezone);
+    
+      HTTP_Code = http.GET();
+      
+      if (HTTP_Code >= 200 && HTTP_Code <= 226){
+          StaticJsonDocument<21> filter;
+          filter["unixtime"] = true;
+
+          const size_t capacity = JSON_OBJECT_SIZE(2);
+          DynamicJsonDocument doc(capacity);
+
+          deserializeJson(doc, http.getString(), DeserializationOption::Filter(filter));
+
+          Output = doc["unixtime"];
+          doc.garbageCollect();
+          filter.garbageCollect();
+
+      }
+
+      else{
+        HTTP_Code;
+      }
+
+      http.end();
+      return Output;
+      }
+}
+
+
+/*
+ * Since the duration is in the epoch time format i need to convert it to regular secconds.
+ * This is done by taking "current time" + "Duration" resulting in duration in secconds. 
+ * 
+ * The JSON request for getting the time when the timer started does not include the time zone....
+ * 
+ * This function makes me cry :'(
+ */
+
+//Not even sure if i can do this properly. Il just use the World Time API for now...
+const int32_t Toggl::getTimerDuration(){
+  
+  uint32_t Output{};
+  const int32_t Duration = (getTimerData("duration")).toInt();
+
+  if (Duration < 0){
+    Output = getCurrentTime(getTimezone()) + Duration;
+  }
+
+  else{
+    Output = 0;
+  }
+  
+  return Output;
+}
+
+
+const String Toggl::getTimerStart(){
+
+  return (getTimerData("start"));
+  
+};
+
+const bool Toggl::isTimerActive(){
+
+  bool output;
+  
+  String wid = getTimerData("wid"); //Just using a filter for less data.
+
+  if(wid != "null"){
+    output = true;
+  }
+  
+  else{
+    output = false;
+  }
+  
+  return output;
+}
 
 //ToDo: For all GET requests. Better memory handling
 //GET requests for user Data
