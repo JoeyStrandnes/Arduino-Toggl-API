@@ -72,51 +72,11 @@ ESP32 default libraries
 ```
 # Examples
 
-### Print username and time zone to the terminal
+- [Start Time Entry:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Start_Time_Entry) Runs a timer for ~10s
 
-### Starts a timer that lasts ~10s
-
-```c++
-/*
-This example will:
-Print the Username and Time zone to the terminal.
-Start a timer with a description "HelloWorld", use the tag "TagName", and created by "ESP".
-
-The timer will be stopped after ~10 seconds
-*/
-
-#include <Toggl.h>
+- [Button Timer:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Button_Timer) Starts a timer and LED when a button is pressed. Stops timer and turns of LED when it is pressed again.
 
 
-const char* SSID = "SSID";
-const char* PASS = "PASSWORD";
 
-String TimerID{};
-int const PID{123456789};                               //Project ID is specific to each user project
-String const Token{"Token"}; 							//API Token is found in "Profile Settings" 
+[Advanced Button Timer:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Advanced_Button_Timer) Does everything that the regular button timer does but will "sync" with other active timers. It will know if a timer is started and will know if it is stopped. The LED and button function will adjust acording to the timer status.
 
-
-Toggl toggl;
-
-void setup(){
-
-    Serial.begin(115200);
-
-    toggl.init(SSID,PASS);
-    toggl.setAuth(Token);
-
-    Serial.println(toggl.getFullName());
-    Serial.println(toggl.getTimezone());
-    
-    TimerID = (toggl.StartTimeEntry("HelloWorld", "TagName", PID, "ESP"));
-    delay(10000);
-    Serial.println(toggl.StopTimeEntry(TimerID));
-  
-}
-
-void loop(){
-
-}
-
-
-```
