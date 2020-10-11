@@ -435,6 +435,14 @@ const bool Toggl::isTimerActive(){
   return output;
 }
 
+const String  Toggl::getTimerID(){
+
+  return getTimerData("id");
+  
+}
+
+
+
 
 //ToDo: For all GET requests. Better memory handling
 //GET requests for user Data

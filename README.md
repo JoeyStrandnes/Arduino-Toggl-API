@@ -34,7 +34,6 @@ getDurationFormat();        //Returns Duration formatting as String
 getAt();                    //Returns AT? as String
 getCreation();              //Returns Account creation date as String
 getTimezone();              //Returns Time zone as string
-getWorkSpace();             //Returns a String of all the workplaces
 ```
 # Create/Start Time Entries
 
@@ -42,6 +41,10 @@ getWorkSpace();             //Returns a String of all the workplaces
 StartTimeEntry(String Description, String Tags, int PID, String CreatedWith); 	// Returns the timer ID as a String
 StopTimeEntry(String ID);	//Returns HTTP error in form of string
 CreateTimeEntry(String Description, String Tags, int Duration, String Start, int PID, String CreatedWith); // Returns the timer ID as a String
+getTimerDuration();		//Returns the duration of the active timer in secconds. Returns 0 if no timer is active.
+getTimerID();			//Returns the active timers ID as String. Returns "null" if no timer is active.
+isTimerActive();		//Returns a bool if timer is active.
+
 ```
 
 # Misc
