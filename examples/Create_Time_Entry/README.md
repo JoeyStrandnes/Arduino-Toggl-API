@@ -1,4 +1,4 @@
-# HelloWorld
+# Create a time entry.
 
 #### This example will:
 

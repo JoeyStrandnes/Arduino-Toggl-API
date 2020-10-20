@@ -72,9 +72,8 @@ ESP32 default libraries
 ```
 # Examples
 
-- [Start Time Entry:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Start_Time_Entry) Runs a timer for ~10s
-
+- [Start Time Entry:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Start_Time_Entry) Runs a timer for ~10s.
+- [Create a Time Entry:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Create_Time_Entry)  Create a time entry with duration 1 hour. 
 - [Button Timer:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Button_Timer) Starts a timer and LED when a button is pressed. Stops timer and turns of LED when it is pressed again.
-
 - [Advanced Button Timer:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Advanced_Button_Timer) Does everything that the regular button timer does but will "sync" with other active timers. It will know if a timer is started and will know if it is stopped. The LED and button function will adjust acording to the timer status.
 
