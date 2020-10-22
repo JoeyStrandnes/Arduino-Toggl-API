@@ -33,7 +33,6 @@
 # endif
 
 class Toggl{
-
   public:
     Toggl();
 
@@ -69,22 +68,16 @@ class Toggl{
     const String    getTimerID();
     const bool      isTimerActive();
     
-    
     //General functionality
     void init(const char* SSID,const char* PASS);
     void setAuth(String const& Token);
 
-
   private:
-
     const uint32_t  getCurrentTime(const String Timezone);
     const String    getUserData(String Input);
     const String    getTimerData(String Input);
     String          AuthorizationKey{};
     const char*     Fingerprint{"51240ac662cb06319ca77b133a9de73f6ba789bf"};  // Fingerprint for Toggle API, expires on 01/10/2021
-
 };
-
-
 
 #endif
