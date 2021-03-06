@@ -49,10 +49,10 @@ const String Toggl::getUserData(String Input){
       int16_t HTTP_Code{};
 
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint); 
 
       HTTPClient https;
-      https.begin(*client, "https://www.toggl.com/api/v8/me");
+      https.begin(*client, BaseUrl + "/me");
       https.addHeader("Authorization", AuthorizationKey);
 
       HTTP_Code = https.GET();
@@ -92,10 +92,10 @@ const String Toggl::StartTimeEntry(String const& Description, String const& Tags
       String payload;
 
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint);
 
       HTTPClient https;
-      https.begin(*client, "https://www.toggl.com/api/v8/time_entries/start");
+	  https.begin(*client, BaseUrl + "/time_entries/start");
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
@@ -131,10 +131,10 @@ String Output{};
 if ((WiFi.status() == WL_CONNECTED)) {
 
   std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-  client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
+  client->setFingerprint(Fingerprint);
 
   HTTPClient https;
-  https.begin(*client, "https://www.toggl.com/api/v8/time_entries/" + ID +"/stop");
+  https.begin(*client, BaseUrl + "/time_entries/" + ID +"/stop");
   https.addHeader("Authorization", AuthorizationKey, true);
   https.addHeader("Content-Type", " application/json");
   String TMP{String(https.PUT(" "))};
@@ -158,10 +158,10 @@ const String Toggl::CreateTimeEntry(String const& Description, String const& Tag
       String payload;
 
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint);
 
       HTTPClient https;
-      https.begin(*client, "https://www.toggl.com/api/v8/time_entries");
+      https.begin(*client, BaseUrl + "/time_entries");
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
@@ -199,10 +199,10 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
       String payload;
 
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint);
 
       HTTPClient https;
-      https.begin(*client, "https://www.toggl.com/api/v8/tags");
+      https.begin(*client, BaseUrl + "/tags");
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
@@ -237,12 +237,12 @@ const String Toggl::getWorkSpace(){
       uint8_t Counter{};
       
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint(Fingerprint); // Fingerprint for Toggle API, expires on 01/10/2021
+      client->setFingerprint(Fingerprint);
 
 
 
       HTTPClient https;
-      https.begin(*client, "https://www.toggl.com/api/v8/workspaces");
+      https.begin(*client, BaseUrl + "/workspaces");
       https.addHeader("Authorization", AuthorizationKey, true);
 
       HTTP_Code = https.GET();
@@ -301,7 +301,7 @@ const String Toggl::getProject(int const& WID){
       client->setFingerprint(Fingerprint);
       
       HTTPClient https;
-      https.begin(*client, "https://toggl.com/api/v8/workspaces/" + String(WID) + "/projects"); // I have no ide why the new API "https://api.track.toggl.com/api/v8/workspaces/{workspace_id}/projects" doesnt work but the old one does. It works on the ESP32
+      https.begin(*client, BaseUrl + "/workspaces/" + String(WID) + "/projects");
       https.addHeader("Authorization", AuthorizationKey);
 
       HTTP_Code = https.GET();
@@ -348,7 +348,7 @@ const String  Toggl::getTimerData(String Input){
       client->setFingerprint(Fingerprint);
       
       HTTPClient https;
-      https.begin(*client, "https://toggl.com/api/v8/time_entries/current");
+      https.begin(*client, BaseUrl + "/time_entries/current");
       https.addHeader("Authorization", AuthorizationKey);
       
       HTTP_Code = https.GET();
