@@ -77,7 +77,8 @@ class Toggl{
     const String    getUserData(String Input);
     const String    getTimerData(String Input);
     String          AuthorizationKey{};
-    const char*     Fingerprint{"51240ac662cb06319ca77b133a9de73f6ba789bf"};  // Fingerprint for Toggle API, expires on 01/10/2021
+    const char*     Fingerprint{"41c40c6a907d364b26d40d40d24f0c1b42f126da"};  // Fingerprint valid until 22 April 2021
+	const String BaseUrl = "https://api.track.toggl.com/api/v8";
 };
 
 #endif

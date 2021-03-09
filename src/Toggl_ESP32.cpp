@@ -39,7 +39,7 @@ const String Toggl::getUserData(String Input){
       int16_t HTTP_Code{};
 
       HTTPClient https;
-      https.begin("https://www.toggl.com/api/v8/me",Fingerprint);
+      https.begin(BaseUrl + "/me",Fingerprint);
       https.addHeader("Authorization", AuthorizationKey);
       
       HTTP_Code = https.GET();
@@ -76,7 +76,7 @@ const String Toggl::StartTimeEntry(String const& Description, String const& Tags
       String payload;
       
       HTTPClient https;
-      https.begin("https://www.toggl.com/api/v8/time_entries/start", Fingerprint);
+      https.begin(BaseUrl + "/time_entries/start", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
@@ -113,7 +113,7 @@ const String Toggl::StopTimeEntry(String const& ID){
   if ((WiFi.status() == WL_CONNECTED)) {
 
       HTTPClient https;
-      https.begin("https://www.toggl.com/api/v8/time_entries/" + ID + "/stop", Fingerprint);
+      https.begin(BaseUrl + "/time_entries/" + ID + "/stop", Fingerprint);
       
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
@@ -138,7 +138,7 @@ const String Toggl::CreateTimeEntry(String const& Description, String const& Tag
       String payload;
  
       HTTPClient https;
-      https.begin("https://www.toggl.com/api/v8/time_entries", Fingerprint);
+      https.begin(BaseUrl + "/time_entries", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
@@ -176,7 +176,7 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
       String payload;
 
       HTTPClient https;
-      https.begin("https://www.toggl.com/api/v8/tags", Fingerprint);
+      https.begin(BaseUrl + "/tags", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
       
@@ -210,7 +210,7 @@ const String Toggl::getWorkSpace(){
       uint16_t HTTP_Code{};
       
       HTTPClient https;
-      https.begin("https://www.toggl.com/api/v8/workspaces", Fingerprint);
+      https.begin(BaseUrl + "/workspaces", Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
 
       HTTP_Code = https.GET();
