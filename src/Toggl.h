@@ -32,10 +32,21 @@
 
 # endif
 
+// Define custom types
+struct KVPair {
+	String name;
+	int id;
+};
+
+struct KVReturnPair {
+	int returnCode;
+	KVPair * KVPairs;
+};
+
 class Toggl{
   public:
     Toggl();
-
+	
     //Get the induvidual account settings/data
     const uint16_t  getID();
     const String    getApiToken();
@@ -55,7 +66,7 @@ class Toggl{
     const String    getTimezone();
 
     //Misc
-    const String    getWorkSpace();
+    KVReturnPair getWorkSpace();
     const String    getProject(int const& WID);
     //const int       getPID(String const& WID ,String const& ProjectName);
     const String    CreateTag(String const& Name, int const& WID);
@@ -73,11 +84,11 @@ class Toggl{
     void setAuth(String const& Token);
 
   private:
-    const uint32_t  getCurrentTime(const String Timezone);
-    const String    getUserData(String Input);
-    const String    getTimerData(String Input);
-    String          AuthorizationKey{};
-    const char*     Fingerprint{"41c40c6a907d364b26d40d40d24f0c1b42f126da"};  // Fingerprint valid until 22 April 2021
+    const uint32_t getCurrentTime(const String Timezone);
+    const String getUserData(String Input);
+    const String getTimerData(String Input);
+    String AuthorizationKey{};
+    const char* Fingerprint{"41c40c6a907d364b26d40d40d24f0c1b42f126da"};  // Fingerprint valid until 22 April 2021
 	const String BaseUrl = "https://api.track.toggl.com/api/v8";
 };
 

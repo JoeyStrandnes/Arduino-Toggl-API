@@ -218,30 +218,31 @@ const String Toggl::getWorkSpace(){
       if(HTTP_Code >= 200 && HTTP_Code <= 226){
 
         DynamicJsonDocument doc(1024);
-  
         StaticJsonDocument<50> filter;
         filter[0]["id"] = true;
         filter[0]["name"] = true;
         
         deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
-              
-        JsonArray arr = doc.as<JsonArray>();
-
-        for (JsonVariant value : arr) {        
-          
-          const int TmpID{value["id"]};
-          Output += TmpID;
-          Output += "\n";
-          String TmpName = value["name"];
-          Output += TmpName + "\n" + "\n";
-
+                
+        JsonArray arr = doc.as<JsonArray>();	
+		
+		TogglProject* projects = new TogglProject[arr.size()];
+		int i = 0;
+        for (JsonVariant value : arr) {  
+		  String TmpName = value["name"];	
+		  const int TmpID{value["id"]};		  
+          projects[i].name = TmpName;
+		  projects[i].id = TmpID;
+		  i++;
         }
         doc.garbageCollect();
         filter.garbageCollect();
+		
+		return projects;
       }
 
       else{
-        Output = ("Error: " + String(HTTP_Code));
+		return NULL;
       }
 
       https.end();

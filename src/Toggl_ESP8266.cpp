@@ -228,7 +228,7 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
 }
 
 
-const String Toggl::getWorkSpace(){
+KVReturnPair Toggl::getWorkSpace(){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -239,7 +239,7 @@ const String Toggl::getWorkSpace(){
       std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
       client->setFingerprint(Fingerprint);
 
-
+	  
 
       HTTPClient https;
       https.begin(*client, BaseUrl + "/workspaces");
@@ -256,27 +256,42 @@ const String Toggl::getWorkSpace(){
         
         deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
                 
-        JsonArray arr = doc.as<JsonArray>();
-
-        for (JsonVariant value : arr) {        
-          
-          const int TmpID{value["id"]};
-          Output += TmpID;
-          Output += "\n";
-          String TmpName = value["name"];
-          Output += TmpName + "\n" + "\n";
-
+        JsonArray arr = doc.as<JsonArray>();	
+		
+		KVPair* projects = new KVPair[arr.size()];
+		KVReturnPair returnData {
+			arr.size(),
+			projects
+		};
+		
+		int i = 0;
+        for (JsonVariant value : arr) {  
+		  String TmpName = value["name"];	
+		  const int TmpID{value["id"]};		  
+          projects[i].name = TmpName;
+		  projects[i].id = TmpID;
+		  i++;
         }
         doc.garbageCollect();
         filter.garbageCollect();
+		
+		return returnData;
       }
 
       else{
-        Output = ("Error: " + String(HTTP_Code));
+		  KVReturnPair returnData {
+			0,
+			NULL
+		};
+		
+		return returnData;
       }
-
+KVReturnPair returnData {
+			0,
+			NULL
+		};
       https.end();
-      return Output;
+      return returnData;
 
      }
 }
