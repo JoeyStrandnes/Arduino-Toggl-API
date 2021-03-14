@@ -201,8 +201,23 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
     }
 }
 
+
+KVReturn Toggl::getWorkSpaces() {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces";
+	getKVPairs(URL, returnData);
+	return returnData;
+}
+
+KVReturn Toggl::getProjects(int const &WID) {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces/" + String(WID) + "/projects";
+	getKVPairs(URL, returnData);
+	return returnData;
+}
+
 //Returns Workplace ID (WID)
-const String Toggl::getWorkSpace(){
+void Toggl::getKVPairs(String const URL, KVReturn &data){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -210,7 +225,7 @@ const String Toggl::getWorkSpace(){
       uint16_t HTTP_Code{};
       
       HTTPClient https;
-      https.begin(BaseUrl + "/workspaces", Fingerprint);
+      https.begin(URL, Fingerprint);
       https.addHeader("Authorization", AuthorizationKey, true);
 
       HTTP_Code = https.GET();
@@ -226,80 +241,30 @@ const String Toggl::getWorkSpace(){
                 
         JsonArray arr = doc.as<JsonArray>();	
 		
-		TogglProject* projects = new TogglProject[arr.size()];
+		data = (KVReturn){HTTP_Code, arr.size(), new KVPair[arr.size()]};
 		int i = 0;
         for (JsonVariant value : arr) {  
-		  String TmpName = value["name"];	
-		  const int TmpID{value["id"]};		  
-          projects[i].name = TmpName;
-		  projects[i].id = TmpID;
-		  i++;
-        }
-        doc.garbageCollect();
-        filter.garbageCollect();
-		
-		return projects;
-      }
-
-      else{
-		return NULL;
-      }
-
-      https.end();
-      return Output;
-
-     }
-}
-
-
-const String Toggl::getProject(int const& WID){
-  
-  if ((WiFi.status() == WL_CONNECTED)) {
-
-      String Output{};
-      uint16_t HTTP_Code{};
-      
-      DynamicJsonDocument doc(1024);
-
-      StaticJsonDocument<50> filter;
-      filter[0]["id"] = true;
-      filter[0]["name"] = true;
-      HTTPClient https;
-      https.begin("https://api.track.toggl.com/api/v8/workspaces/" + String(WID) + "/projects", Fingerprint);
-      https.addHeader("Authorization", AuthorizationKey, true);
-
-      HTTP_Code = https.GET();
-
-      if(HTTP_Code >= 200 && HTTP_Code <= 226){
-        
-        deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
-        
-        
-        JsonArray arr = doc.as<JsonArray>();
-
-
-        for (JsonVariant value : arr) {        
-          
-          const int TmpID{value["id"]};
-          Output += TmpID;
-          Output += "\n";
+		  // directly assigning value["name"] doesn't work
           String TmpName = value["name"];
-          Output += TmpName + "\n" + "\n";
-
+          data.KVPairs[i].name = TmpName; 
+          data.KVPairs[i].id = int(value["id"]);
+          i++;
         }
         doc.garbageCollect();
         filter.garbageCollect();
       }
-
       else{
-        Output = ("Error: " + String(HTTP_Code));
+	    data = (KVReturn){HTTP_Code, 0, NULL};
       }
 
       https.end();
-      return Output;
-
      }
+	 else {
+		 data = (KVReturn){-1, 0, NULL};
+	 }
 }
+
+
 
 /*
 //ToDo make the code somewhat nicer.

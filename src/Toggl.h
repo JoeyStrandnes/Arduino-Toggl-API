@@ -32,14 +32,17 @@
 
 # endif
 
-// Define custom types
+// Key/Value Pair
 struct KVPair {
 	String name;
 	int id;
 };
 
-struct KVReturnPair {
-	int returnCode;
+// A Key/Value return struct, including HTTP code for readability/
+// This is essentially a std::arr, but there's not support for that in the default Arduino libs
+struct KVReturn {
+	int HTTPCode;
+	int pairCount;
 	KVPair * KVPairs;
 };
 
@@ -66,8 +69,8 @@ class Toggl{
     const String    getTimezone();
 
     //Misc
-    KVReturnPair getWorkSpace();
-    const String    getProject(int const& WID);
+    KVReturn        getWorkSpaces();
+    KVReturn        getProjects(int const& WID);
     //const int       getPID(String const& WID ,String const& ProjectName);
     const String    CreateTag(String const& Name, int const& WID);
     
@@ -84,6 +87,7 @@ class Toggl{
     void setAuth(String const& Token);
 
   private:
+	void getKVPairs(String const URL, KVReturn &data);
     const uint32_t getCurrentTime(const String Timezone);
     const String getUserData(String Input);
     const String getTimerData(String Input);
