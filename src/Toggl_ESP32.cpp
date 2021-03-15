@@ -225,7 +225,7 @@ void Toggl::getKVPairs(String const URL, KVReturn &data){
       uint16_t HTTP_Code{};
       
       HTTPClient https;
-      https.begin(BaseUrl + "/workspaces", root_ca);
+      https.begin(URL, root_ca);
       https.addHeader("Authorization", AuthorizationKey, true);
 
       HTTP_Code = https.GET();
