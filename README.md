@@ -50,19 +50,22 @@ isTimerActive();		//Returns a bool if timer is active.
 # Misc
 
 ```c++
-getWorkSpaces(); 					// Returns a KVReturn struct of all workspaces
-getProject(int const& WID); 		// Returns a KVReturn struct of all projects for a given workspace
-CreateTag(String Name, int WID); 	// Requires the Workspace ID
+getWorkSpaces();                   // Returns a KVReturn struct of all workspaces
+getProjects(int const& WID);       // Returns a KVReturn struct of all projects for a given workspace
+getTags(int const& WID);           // Returns a KVReturn struct of all tags for a given workspace
+CreateTag(String Name, int WID);   // Requires the Workspace ID
 ```
 
 The `KVReturn` struct is as follows:
+
 ```c++
 struct KVReturn {
-	int HTTPCode;
-	int pairCount;
-	KVPair * KVPairs;
+    int HTTPCode;
+    int pairCount;
+    KVPair * KVPairs;
 };
 ```
+
 It is important to `delete[]` the KVPairs after you've used what you've needed, or set it to `NULL`  if you plan to use it again. See the "Get All Projects" example for more info.
 
 

@@ -71,6 +71,7 @@ class Toggl{
     //Misc
     KVReturn        getWorkSpaces();
     KVReturn        getProjects(int const& WID);
+    KVReturn        getTags(int const& WID);
     //const int       getPID(String const& WID ,String const& ProjectName);
     const String    CreateTag(String const& Name, int const& WID);
     

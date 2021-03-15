@@ -216,6 +216,13 @@ KVReturn Toggl::getProjects(int const &WID) {
 	return returnData;
 }
 
+KVReturn Toggl::getTags(int const &WID) {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces/" + String(WID) + "/tags";
+	getKVPairs(URL, returnData);
+	return returnData;
+}
+
 //Returns Workplace ID (WID)
 void Toggl::getKVPairs(String const URL, KVReturn &data){
 
