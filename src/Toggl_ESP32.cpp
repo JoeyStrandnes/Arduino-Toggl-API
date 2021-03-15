@@ -39,7 +39,7 @@ const String Toggl::getUserData(String Input){
       int16_t HTTP_Code{};
 
       HTTPClient https;
-      https.begin(BaseUrl + "/me",Fingerprint);
+      https.begin(BaseUrl + "/me", root_ca);
       https.addHeader("Authorization", AuthorizationKey);
       
       HTTP_Code = https.GET();
@@ -76,7 +76,7 @@ const String Toggl::StartTimeEntry(String const& Description, String const& Tags
       String payload;
       
       HTTPClient https;
-      https.begin(BaseUrl + "/time_entries/start", Fingerprint);
+      https.begin(BaseUrl + "/time_entries/start", root_ca);
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
@@ -113,7 +113,7 @@ const String Toggl::StopTimeEntry(String const& ID){
   if ((WiFi.status() == WL_CONNECTED)) {
 
       HTTPClient https;
-      https.begin(BaseUrl + "/time_entries/" + ID + "/stop", Fingerprint);
+      https.begin(BaseUrl + "/time_entries/" + ID + "/stop", root_ca);
       
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
@@ -138,7 +138,7 @@ const String Toggl::CreateTimeEntry(String const& Description, String const& Tag
       String payload;
  
       HTTPClient https;
-      https.begin(BaseUrl + "/time_entries", Fingerprint);
+      https.begin(BaseUrl + "/time_entries", root_ca);
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
 
@@ -176,7 +176,7 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
       String payload;
 
       HTTPClient https;
-      https.begin(BaseUrl + "/tags", Fingerprint);
+      https.begin(BaseUrl + "/tags", root_ca);
       https.addHeader("Authorization", AuthorizationKey, true);
       https.addHeader("Content-Type", " application/json");
       
@@ -225,7 +225,7 @@ void Toggl::getKVPairs(String const URL, KVReturn &data){
       uint16_t HTTP_Code{};
       
       HTTPClient https;
-      https.begin(URL, Fingerprint);
+      https.begin(BaseUrl + "/workspaces", root_ca);
       https.addHeader("Authorization", AuthorizationKey, true);
 
       HTTP_Code = https.GET();
@@ -264,8 +264,6 @@ void Toggl::getKVPairs(String const URL, KVReturn &data){
 	 }
 }
 
-
-
 /*
 //ToDo make the code somewhat nicer.
 const int Toggl::getPID(String const& WID ,String const& ProjectName){
@@ -291,7 +289,7 @@ const String  Toggl::getTimerData(String Input){
       int16_t HTTP_Code{};
 
       HTTPClient https;
-      https.begin("https://api.track.toggl.com/api/v8/time_entries/current",Fingerprint);
+      https.begin("https://api.track.toggl.com/api/v8/time_entries/current",root_ca);
       https.addHeader("Authorization", AuthorizationKey);
       
       HTTP_Code = https.GET();
