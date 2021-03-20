@@ -94,7 +94,7 @@ class Toggl{
     const String getUserData(String Input);
     const String getTimerData(String Input);
     String AuthorizationKey{};
-    const char* Fingerprint{"41c40c6a907d364b26d40d40d24f0c1b42f126da"};  // Fingerprint valid until 22 April 2021
+    const char* Fingerprint{"dac8ac00a1aab269af2149ddb4bd5c881a1a9613"};  // Fingerprint valid until 18 June 2021
 	const char* root_ca = \
 	"-----BEGIN CERTIFICATE-----\n"\
 	"MIIESjCCAzKgAwIBAgINAeO0nXfN9AwGGRa24zANBgkqhkiG9w0BAQsFADBMMSAw\n"\
