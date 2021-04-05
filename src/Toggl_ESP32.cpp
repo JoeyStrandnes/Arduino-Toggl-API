@@ -201,8 +201,30 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
     }
 }
 
+
+KVReturn Toggl::getWorkSpaces() {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces";
+	getKVPairs(URL, returnData);
+	return returnData;
+}
+
+KVReturn Toggl::getProjects(int const &WID) {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces/" + String(WID) + "/projects";
+	getKVPairs(URL, returnData);
+	return returnData;
+}
+
+KVReturn Toggl::getTags(int const &WID) {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces/" + String(WID) + "/tags";
+	getKVPairs(URL, returnData);
+	return returnData;
+}
+
 //Returns Workplace ID (WID)
-const String Toggl::getWorkSpace(){
+void Toggl::getKVPairs(String const URL, KVReturn &data){
 
   if ((WiFi.status() == WL_CONNECTED)) {
 
@@ -210,7 +232,7 @@ const String Toggl::getWorkSpace(){
       uint16_t HTTP_Code{};
       
       HTTPClient https;
-      https.begin(BaseUrl + "/workspaces", root_ca);
+      https.begin(URL, root_ca);
       https.addHeader("Authorization", AuthorizationKey, true);
 
       HTTP_Code = https.GET();
@@ -218,86 +240,35 @@ const String Toggl::getWorkSpace(){
       if(HTTP_Code >= 200 && HTTP_Code <= 226){
 
         DynamicJsonDocument doc(1024);
-  
         StaticJsonDocument<50> filter;
         filter[0]["id"] = true;
         filter[0]["name"] = true;
         
         deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
-              
-        JsonArray arr = doc.as<JsonArray>();
-
-        for (JsonVariant value : arr) {        
-          
-          const int TmpID{value["id"]};
-          Output += TmpID;
-          Output += "\n";
+                
+        JsonArray arr = doc.as<JsonArray>();	
+		
+		data = (KVReturn){HTTP_Code, arr.size(), new KVPair[arr.size()]};
+		int i = 0;
+        for (JsonVariant value : arr) {  
+		  // directly assigning value["name"] doesn't work
           String TmpName = value["name"];
-          Output += TmpName + "\n" + "\n";
-
+          data.KVPairs[i].name = TmpName; 
+          data.KVPairs[i].id = int(value["id"]);
+          i++;
         }
         doc.garbageCollect();
         filter.garbageCollect();
       }
-
       else{
-        Output = ("Error: " + String(HTTP_Code));
+	    data = (KVReturn){HTTP_Code, 0, NULL};
       }
 
       https.end();
-      return Output;
-
      }
-}
-
-
-const String Toggl::getProject(int const& WID){
-  
-  if ((WiFi.status() == WL_CONNECTED)) {
-
-      String Output{};
-      uint16_t HTTP_Code{};
-      
-      DynamicJsonDocument doc(1024);
-
-      StaticJsonDocument<50> filter;
-      filter[0]["id"] = true;
-      filter[0]["name"] = true;
-      HTTPClient https;
-      https.begin("https://api.track.toggl.com/api/v8/workspaces/" + String(WID) + "/projects", root_ca);
-      https.addHeader("Authorization", AuthorizationKey, true);
-
-      HTTP_Code = https.GET();
-
-      if(HTTP_Code >= 200 && HTTP_Code <= 226){
-        
-        deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
-        
-        
-        JsonArray arr = doc.as<JsonArray>();
-
-
-        for (JsonVariant value : arr) {        
-          
-          const int TmpID{value["id"]};
-          Output += TmpID;
-          Output += "\n";
-          String TmpName = value["name"];
-          Output += TmpName + "\n" + "\n";
-
-        }
-        doc.garbageCollect();
-        filter.garbageCollect();
-      }
-
-      else{
-        Output = ("Error: " + String(HTTP_Code));
-      }
-
-      https.end();
-      return Output;
-
-     }
+	 else {
+		 data = (KVReturn){-1, 0, NULL};
+	 }
 }
 
 /*

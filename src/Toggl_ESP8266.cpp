@@ -228,112 +228,79 @@ const String Toggl::CreateTag(String const& Name, int const& WID){
 }
 
 
-const String Toggl::getWorkSpace(){
-
-  if ((WiFi.status() == WL_CONNECTED)) {
-
-      String Output{};
-      uint16_t HTTP_Code{};
-      uint8_t Counter{};
-      
-      std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint(Fingerprint);
-
-
-
-      HTTPClient https;
-      https.begin(*client, BaseUrl + "/workspaces");
-      https.addHeader("Authorization", AuthorizationKey, true);
-
-      HTTP_Code = https.GET();
-
-      if(HTTP_Code >= 200 && HTTP_Code <= 226){
-
-        DynamicJsonDocument doc(1024);
-        StaticJsonDocument<50> filter;
-        filter[0]["id"] = true;
-        filter[0]["name"] = true;
-        
-        deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
-                
-        JsonArray arr = doc.as<JsonArray>();
-
-        for (JsonVariant value : arr) {        
-          
-          const int TmpID{value["id"]};
-          Output += TmpID;
-          Output += "\n";
-          String TmpName = value["name"];
-          Output += TmpName + "\n" + "\n";
-
-        }
-        doc.garbageCollect();
-        filter.garbageCollect();
-      }
-
-      else{
-        Output = ("Error: " + String(HTTP_Code));
-      }
-
-      https.end();
-      return Output;
-
-     }
+KVReturn Toggl::getWorkSpaces() {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces";
+	getKVPairs(URL, returnData);
+	return returnData;
 }
 
+KVReturn Toggl::getProjects(int const &WID) {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces/" + String(WID) + "/projects";
+	getKVPairs(URL, returnData);
+	return returnData;
+}
 
-// Need to solve the address problem..
-const String Toggl::getProject(int const& WID){
+KVReturn Toggl::getTags(int const &WID) {
+	KVReturn returnData{};
+	String URL = BaseUrl + "/workspaces/" + String(WID) + "/tags";
+	getKVPairs(URL, returnData);
+	return returnData;
+}
 
+void Toggl::getKVPairs(String const URL, KVReturn &data) {
   
   if ((WiFi.status() == WL_CONNECTED)) {
 
-      String Output{};
-      uint16_t HTTP_Code{};
-      
-      DynamicJsonDocument doc(1024);
+    String Output{};
+    uint16_t HTTP_Code{};
 
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    client->setFingerprint(Fingerprint);
+
+    HTTPClient https;
+    https.begin(*client, URL);
+    https.addHeader("Authorization", AuthorizationKey, true);
+
+    HTTP_Code = https.GET();
+
+    if (HTTP_Code >= 200 && HTTP_Code <= 226) {
+
+      DynamicJsonDocument doc(1024);
       StaticJsonDocument<50> filter;
       filter[0]["id"] = true;
       filter[0]["name"] = true;
 
-      std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-      client->setFingerprint(Fingerprint);
-      
-      HTTPClient https;
-      https.begin(*client, BaseUrl + "/workspaces/" + String(WID) + "/projects");
-      https.addHeader("Authorization", AuthorizationKey);
+      deserializeJson(doc, https.getString(),DeserializationOption::Filter(filter));
 
-      HTTP_Code = https.GET();
+      JsonArray arr = doc.as<JsonArray>();
 
-      if(HTTP_Code >= 200 && HTTP_Code <= 226){
-        
-        deserializeJson(doc, https.getString(), DeserializationOption::Filter(filter));     
-      
-        JsonArray arr = doc.as<JsonArray>();
-        
-        for (JsonVariant value : arr){        
-
-          const int TmpID{value["id"]};
-          Output += TmpID;
-          Output += "\n";
-          String TmpName = value["name"];
-          Output += TmpName + "\n" + "\n";
-        }
-        doc.garbageCollect();
-        filter.garbageCollect();
+	  data = (KVReturn){HTTP_Code, arr.size(), new KVPair[arr.size()]};
+      int i = 0;
+      for (JsonVariant value : arr) {
+		// directly assigning value["name"] doesn't work
+        String TmpName = value["name"];
+        data.KVPairs[i].name = TmpName; 
+        data.KVPairs[i].id = int(value["id"]);
+        i++;
       }
+	  
+      doc.garbageCollect();
+      filter.garbageCollect();
 
-      else{
-        Output = ("Error: " + String(HTTP_Code));
-      }
-
-      https.end();
-      return Output;
-
-     }
-     
+    } 
+	else {
+	  data = (KVReturn){HTTP_Code, 0, NULL};
+    }
+	
+	https.end();
+  }
+  else {
+	  data = (KVReturn){-1, 0, NULL};
+  }
 }
+
 
 
 const String  Toggl::getTimerData(String Input){

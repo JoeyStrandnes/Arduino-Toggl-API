@@ -50,10 +50,25 @@ isTimerActive();		//Returns a bool if timer is active.
 # Misc
 
 ```c++
-getWorkSpace(); 					// Returns a "pretty" string of all workspaces and ID's
-getProject(int const& WID); 		// Returns a "pretty" string of all project is specific workplace
-CreateTag(String Name, int WID); 	// Requires the Workspace ID
+getWorkSpaces();                   // Returns a KVReturn struct of all workspaces
+getProjects(int const& WID);       // Returns a KVReturn struct of all projects for a given workspace
+getTags(int const& WID);           // Returns a KVReturn struct of all tags for a given workspace
+CreateTag(String Name, int WID);   // Requires the Workspace ID
 ```
+
+The `KVReturn` struct is as follows:
+
+```c++
+struct KVReturn {
+    int HTTPCode;
+    int pairCount;
+    KVPair * KVPairs;
+};
+```
+
+It is important to `delete[]` the KVPairs after you've used what you've needed, or set it to `NULL`  if you plan to use it again. See the "Get All Projects" example for more info.
+
+
 
 
 
@@ -76,4 +91,4 @@ ESP32 default libraries
 - [Create a Time Entry:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Create_Time_Entry)  Create a time entry with duration 1 hour. 
 - [Button Timer:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Button_Timer) Starts a timer and LED when a button is pressed. Stops timer and turns of LED when it is pressed again.
 - [Advanced Button Timer:](https://github.com/JoeyStrandnes/Arduino-Toggl-API/tree/master/examples/Advanced_Button_Timer) Does everything that the regular button timer does but will "sync" with other active timers. It will know if a timer is started and will know if it is stopped. The LED and button function will adjust acording to the timer status.
-
+- [Get All Projects:](/examples/Get_All_Projects) Gets all projects in all workspaces for a given user.

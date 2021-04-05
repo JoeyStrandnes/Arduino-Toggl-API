@@ -32,10 +32,24 @@
 
 # endif
 
+// Key/Value Pair
+struct KVPair {
+	String name;
+	int id;
+};
+
+// A Key/Value return struct, including HTTP code for readability/
+// This is essentially a std::arr, but there's not support for that in the default Arduino libs
+struct KVReturn {
+	int HTTPCode;
+	int pairCount;
+	KVPair * KVPairs;
+};
+
 class Toggl{
   public:
     Toggl();
-
+	
     //Get the induvidual account settings/data
     const uint16_t  getID();
     const String    getApiToken();
@@ -55,8 +69,9 @@ class Toggl{
     const String    getTimezone();
 
     //Misc
-    const String    getWorkSpace();
-    const String    getProject(int const& WID);
+    KVReturn        getWorkSpaces();
+    KVReturn        getProjects(int const& WID);
+    KVReturn        getTags(int const& WID);
     //const int       getPID(String const& WID ,String const& ProjectName);
     const String    CreateTag(String const& Name, int const& WID);
     
@@ -73,11 +88,13 @@ class Toggl{
     void setAuth(String const& Token);
 
   private:
-    const uint32_t  getCurrentTime(const String Timezone);
-    const String    getUserData(String Input);
-    const String    getTimerData(String Input);
-    String          AuthorizationKey{};
-    const char*     Fingerprint{"41c40c6a907d364b26d40d40d24f0c1b42f126da"};  // Fingerprint valid until 22 April 2021
+
+	void getKVPairs(String const URL, KVReturn &data);
+    const uint32_t getCurrentTime(const String Timezone);
+    const String getUserData(String Input);
+    const String getTimerData(String Input);
+    String AuthorizationKey{};
+    const char* Fingerprint{"dac8ac00a1aab269af2149ddb4bd5c881a1a9613"};  // Fingerprint valid until 18 June 2021
 	const char* root_ca = \
 	"-----BEGIN CERTIFICATE-----\n"\
 	"MIIESjCCAzKgAwIBAgINAeO0nXfN9AwGGRa24zANBgkqhkiG9w0BAQsFADBMMSAw\n"\
