@@ -35,7 +35,8 @@
 class Toggl{
   public:
     Toggl();
-
+	  //~Toggl();
+   
     //Get the induvidual account settings/data
     const uint16_t  getID();
     const String    getApiToken();
@@ -54,9 +55,11 @@ class Toggl{
     const String    getCreation();
     const String    getTimezone();
 
+
     //Misc
-    const String    getWorkSpace();
-    const String    getProject(int const& WID);
+    uint16_t getWorkSpace();
+    
+    
     //const int       getPID(String const& WID ,String const& ProjectName);
     const String    CreateTag(String const& Name, int const& WID);
     
@@ -73,12 +76,46 @@ class Toggl{
     void setAuth(String const& Token);
 
   private:
-    const uint32_t  getCurrentTime(const String Timezone);
-    const String    getUserData(String Input);
-    const String    getTimerData(String Input);
-    String          AuthorizationKey{};
-    const char*     Fingerprint{"41c40c6a907d364b26d40d40d24f0c1b42f126da"};  // Fingerprint valid until 22 April 2021
-	const char* root_ca = \
+
+  
+  //Assume that the compiler does its job :)
+  //Double linked lists of double linked lists. 
+  struct project{
+    uint32_t PID;
+    String P_Name;
+    struct project *next;
+    struct project *prev;    
+  };
+  
+  struct workspace{
+    uint32_t WID;
+    String W_Name;
+    uint8_t Project_Counter;
+    struct workspace *next;
+    struct workspace *prev;
+    struct project *FirstP;
+    struct project *LastP;
+  };
+
+  uint32_t DefaultWID;
+  uint8_t Workspace_Counter;
+  struct workspace *First_Workspace;
+  struct workspace *Last_Workspace;
+
+  void InsertWorkspace(); //Appends
+  workspace* FindWorkspace(uint32_t WID);
+  void RemoveWorkspace(struct workspace *WSpace);
+
+  void InsertProject(); //Appends
+  project* FindProject(uint32_t PID, struct workspace *WSpace);
+  void RemoveProject(struct project *Proj);
+    
+    const uint32_t getCurrentTime(const String Timezone);
+    const String getUserData(String Input);
+    const String getTimerData(String Input);   
+    String AuthorizationKey{};
+    const char* Fingerprint{"dac8ac00a1aab269af2149ddb4bd5c881a1a9613"};  // Fingerprint valid until 18 June 2021
+	  const char* root_ca = \
 	"-----BEGIN CERTIFICATE-----\n"\
 	"MIIESjCCAzKgAwIBAgINAeO0nXfN9AwGGRa24zANBgkqhkiG9w0BAQsFADBMMSAw\n"\
 	"HgYDVQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMjETMBEGA1UEChMKR2xvYmFs\n"\
